@@ -4,7 +4,7 @@
 
 **源码：** [github.com/SihanLv/dsh-literature](https://github.com/SihanLv/dsh-literature)
 
-**一次查询，同时覆盖 dblp 与 arXiv。** 面向 DeepSeek Harness 的文献调研能力：同时检索两个数据库，每篇论文只返回一条合并记录，取到最权威的 BibTeX，以及存在的全文——模型无需自己在两库之间来回切换。
+**一次查询，同时覆盖 dblp 与 arXiv。** 面向 DeepSeek Harness 的文献调研能力：同时检索两个数据库，每篇论文只返回一条合并记录，取到最权威的 BibTeX，以及可获取的全文——模型无需自己在两库之间来回切换。
 
 把 `@shlv/dsh-literature` 装入任意 profile（Web 或 Headless），即可获得三个面向模型的工具：`literature_search`、`literature_bibtex` 与 `literature_fulltext`。
 
@@ -15,27 +15,29 @@ dsh plugin --profile headless add @shlv/dsh-literature
 dsh plugin --profile web add @shlv/dsh-literature
 ```
 
-一条命令装上整个系列。在带 `DEEPSEEK_API_KEY` 的源码 checkout 中，改用仓库自带 patch 挂载：
+一条命令装上整个系列。如需从 dsh 官方仓库（deepseek-harness）源码运行而非安装 npm 包，先设置 `DEEPSEEK_API_KEY`，再用本仓库自带的 `literature.patch.yml` 挂载：
 
 ```sh
-cd deepseek-harness   # 一个 dsh checkout
+cd <dsh 官方仓库目录>   # 例如 deepseek-harness
 pnpm dsh --profile headless --patch /path/to/dsh-literature/literature.patch.yml \
   "搜索 'Attention is all you need'，获取其 BibTeX，再下载全文"
 ```
 
+（`/path/to/dsh-literature` 换成你 clone 本仓库的路径。）
+
 ## 为什么需要它
 
-学术检索分散在两个覆盖互补的数据库：**dblp** 收录正式发表的记录（外加 arXiv `cs.*` 预印本的 CoRR 镜像），**arXiv** 收录 dblp 同步滞后的预印本。让模型自己查两个库再对账，既浪费 token 又产生不一致的引用。这个 seam 一次性完成对账：去重、权威来源优先、回退，都是策略而非提示词工程。
+学术检索分散在两个覆盖互补的数据库：**dblp** 收录正式发表的记录（外加 arXiv `cs.*` 预印本的 CoRR 镜像），**arXiv** 收录 dblp 同步滞后的预印本。让模型自己查两个库再对账，既浪费 token 又产生不一致的引用。这个 seam（两个来源共享的核心服务）一次性完成对账：去重、权威来源优先、回退，都是策略而非提示词工程。
 
 ## 亮点
 
 - **每篇论文一条合并记录。** dblp CoRR 镜像、正式发表记录与 arXiv 预印本合并为一条记录——按 arXiv id（必要时从 CoRR key 反推）、其次出版商 DOI、最后归一化标题去重。
 - **自动选择权威 BibTeX。** 已发表论文优先正式 dblp 条目；尚未发表的预印本取引用形态正确的 arXiv `@misc`；dblp CoRR 镜像仅作最后兜底。不再把镜像伪产物当作正式记录引用。
 - **有全文就取全文。** 依次获取 arXiv LaTeX 源码包、HTML5 渲染、PDF；对仅含 DOI 或落地页的引用，通过零工具子代理解析出版商 PDF 链接并提取正文。
-- **模型可复用的稳定 id。** 每条合并记录携带合成 `id`（`arxiv:…`、`dblp:…`、`doi:…`、`title:…`），模型可直接回传给 `literature_bibtex` / `literature_fulltext`。
-- **精确的标题解析。** 标题查询拉取完整 dblp 命中列表加短语引号 arXiv 搜索，再按 BM25 标题相似度重排——即使有更新的同主题论文排在前，你要找的论文仍会胜出。
-- **慢下载不阻塞回合。** `literature_fulltext` 默认作为 `ctx.jobs` 后台任务运行并立即返回 job id，用 `job_output` 收集结果。发布商站点上实测 25–60 秒的下载不会拖住 agent 循环。
-- **加固的传输层。** 所有请求共享一层加固的 HTTP：URL 卫生、禁止内嵌凭据、同源重定向且最多一次跨域跳转、字节上限、协作式超时。
+- **模型可复用的稳定 id。** 每条合并记录携带稳定的、由插件生成的 `id`（`arxiv:…`、`dblp:…`、`doi:…`、`title:…`），模型可直接回传给 `literature_bibtex` / `literature_fulltext`。
+- **精确的标题解析。** 标题查询拉取完整的 dblp 命中列表，并在 arXiv 上做带引号的精确短语搜索，再按 BM25 标题相似度重排——即使有更新的同主题论文排在前，你要找的论文仍会胜出。
+- **慢下载不阻塞回合。** `literature_fulltext` 默认作为 `ctx.jobs` 后台任务运行并立即返回 job id，用 `job_output` 收集结果。发布商站点上 25–60 秒的下载不会拖住 agent 循环。
+- **加固的传输层。** 所有请求共享一层加固的 HTTP：URL 合法性校验、禁止内嵌凭据、同源重定向且最多一次跨域跳转、字节上限、协作式超时。
 - **默认礼貌限流。** 两个提供方都通过限速器串行请求（arXiv 按其文档规定的 3 秒间隔，429/503 带指数退避）；单个被限流的来源不会拖垮整个搜索。
 
 ## 架构
@@ -57,7 +59,7 @@ pnpm dsh --profile headless --patch /path/to/dsh-literature/literature.patch.yml
 - DeepSeek Harness `0.1.0-rc.6` 或兼容的后续版本（插件在该版本线声明 `@deepseek-ai/dsh-*` peer）。
 - Node.js `^22.19` 或 `>=24`。
 - `literature_fulltext` 的后台模式使用 `@deepseek-ai/dsh-jobs-local` 与 `@deepseek-ai/dsh-tool-jobs`——它们由 Harness 的 profile base bundle 默认提供（headless 与 web profile 自带）；若你的 profile 缺少，可用 `dsh plugin add` 安装。
-- 出版商 PDF 回退需要带支持 `outputSchema` 的 provider 的 `subagents` 服务（默认 `spawn`）。缺少时，仅含 DOI 与落地页的输入报告 `LITERATURE_FULLTEXT_UNAVAILABLE`；搜索、BibTeX 与 arXiv 全文仍可用。
+- 出版商 PDF 回退需要 `subagents` 服务，且其 provider 支持 `outputSchema`（默认 `spawn`）。缺少时，仅含 DOI 与落地页的输入报告 `LITERATURE_FULLTEXT_UNAVAILABLE`；搜索、BibTeX 与 arXiv 全文仍可用。
 
 ## 安装与生命周期
 
@@ -103,7 +105,7 @@ dsh plugin --profile headless add @shlv/dsh-literature@0.1.1
 
 ## 配置
 
-每个包都通过 cordis.yml 行接受校验过的配置；所有值都有默认值并可在部署时调整。
+每个包都通过你 profile 目录下 `cordis.yml` 中的一行接受校验过的配置（dsh 的插件配置文件）；所有值都有默认值并可在部署时调整。
 
 | 包 | 关键选项（默认值） |
 |---|---|
@@ -114,7 +116,7 @@ dsh plugin --profile headless add @shlv/dsh-literature@0.1.1
 
 ## 模型体验
 
-工具保持模型上下文精简：`literature_search` 每篇论文一行并带截断页脚，`literature_bibtex` 一个围栏代码块加可选说明，`literature_fulltext` 返回有界摘要，提取的正文写入磁盘而非回显进提示词。seam 自身不贡献提示词或 schema；消费方拥有所有模型可见文案。
+工具保持模型上下文精简：`literature_search` 每篇论文一行，结果被截断时附一行提示；`literature_bibtex` 一个围栏代码块加可选说明；`literature_fulltext` 返回有界摘要，提取的正文写入磁盘而非回显进提示词。seam 自身不贡献提示词或 schema；消费方拥有所有模型可见文案。
 
 ## 故障排查
 

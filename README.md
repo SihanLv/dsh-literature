@@ -15,24 +15,26 @@ dsh plugin --profile headless add @shlv/dsh-literature
 dsh plugin --profile web add @shlv/dsh-literature
 ```
 
-One command installs the whole family. From a source checkout with `DEEPSEEK_API_KEY` set, mount the repository patch instead:
+One command installs the whole family. To run from the dsh source repository (deepseek-harness) instead of the installed npm packages, set `DEEPSEEK_API_KEY` and mount this repository's `literature.patch.yml`:
 
 ```sh
-cd deepseek-harness   # a dsh checkout
+cd <your dsh checkout>   # e.g. deepseek-harness
 pnpm dsh --profile headless --patch /path/to/dsh-literature/literature.patch.yml \
   "search for 'Attention is all you need', fetch its BibTeX, then download the full text"
 ```
 
+(`/path/to/dsh-literature` is where you cloned this repository.)
+
 ## Why this exists
 
-Academic search splits across two databases with complementary coverage: **dblp** holds formal published records (plus CoRR mirrors of arXiv `cs.*` preprints), while **arXiv** holds preprints that dblp syncs with a lag. Asking the model to query both and reconcile the answers wastes tokens and produces inconsistent citations. This seam does the reconciliation once: dedupe, authoritative-source preference, and fallback are policy, not prompt engineering.
+Academic search splits across two databases with complementary coverage: **dblp** holds formal published records (plus CoRR mirrors of arXiv `cs.*` preprints), while **arXiv** holds preprints that dblp syncs with a lag. Asking the model to query both and reconcile the answers wastes tokens and produces inconsistent citations. This seam (the shared service behind both sources) does the reconciliation once: dedupe, authoritative-source preference, and fallback are policy, not prompt engineering.
 
 ## Highlights
 
 - **One merged record per paper.** A dblp CoRR mirror, its formal published record, and the arXiv preprint collapse into a single record — deduped by arXiv id (derived from the CoRR key when needed), then publisher DOI, then normalized title.
 - **Authoritative BibTeX, automatically.** Formal dblp entry wins for published papers; a still-unpublished preprint gets the citation-correct arXiv `@misc`; the dblp CoRR mirror is the last resort. No more citing a mirror artifact as the paper of record.
 - **Full text when it exists.** Acquires the arXiv LaTeX source tarball, then the HTML5 rendering, then the PDF — and for DOI-only or landing-page references, resolves the publisher PDF link through a zero-tool subagent and extracts the body text.
-- **Stable ids the model can reuse.** Every merged record carries a synthetic `id` (`arxiv:…`, `dblp:…`, `doi:…`, `title:…`) the model can pass straight back to `literature_bibtex` / `literature_fulltext`.
+- **Stable ids the model can reuse.** Every merged record carries a stable plugin-generated `id` (`arxiv:…`, `dblp:…`, `doi:…`, `title:…`) the model can pass straight back to `literature_bibtex` / `literature_fulltext`.
 - **Precise title resolution.** Title queries pull the full dblp hit list plus a phrase-quoted arXiv search, then rerank by BM25 title similarity — the paper you meant wins even when a newer same-topic paper would sort first.
 - **Slow downloads never block a turn.** `literature_fulltext` runs as a background `ctx.jobs` job by default and returns a job id; `job_output` collects the result. Downloads that measure 25–60 s on publisher sites don't stall the agent loop.
 - **Hardened transport.** One HTTP layer for every request with URL hygiene, no embedded credentials, same-origin redirects with at most one cross-origin hop, byte caps, and cooperative deadlines.
@@ -103,7 +105,7 @@ Each tool takes one free-form `query` string; the seam recognizes titles, arXiv 
 
 ## Configuration
 
-Each package accepts validated config through its cordis.yml row; every value is defaulted and deployment-tunable.
+Each package accepts validated config through a row in your profile's `cordis.yml` (the dsh plugin configuration file); every value is defaulted and deployment-tunable.
 
 | Package | Key options (defaults) |
 |---|---|
