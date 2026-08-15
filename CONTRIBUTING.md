@@ -51,6 +51,8 @@ git tag v0.1.2 && git push origin v0.1.2   # triggers the workflow
 
 The workflow checks out, installs, runs typecheck/test/build, verifies the five versions match the tag, verifies each tarball carries its runtime modules, publishes the five packages in dependency order, and creates a GitHub Release with auto-generated notes. On `workflow_dispatch` the tag check is skipped.
 
+**Testing the pipeline without a release.** Run the workflow manually from the Actions tab with **Dry run** enabled (`workflow_dispatch` → `dry_run`): every step runs — including a `pnpm -r publish --dry-run` that packs each package — but nothing is published to npm and no Release is created, and no tag or version bump is required.
+
 **Manual.** You can also publish from a local checkout (run `npm login` first — you must own the `@shlv` scope):
 
 ```sh

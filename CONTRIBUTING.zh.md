@@ -51,6 +51,8 @@ git tag v0.1.2 && git push origin v0.1.2   # 触发 workflow
 
 workflow 会：checkout、安装依赖、跑 typecheck／test／build，校验五个版本与 tag 一致、校验每个 tarball 携带运行时模块，然后按依赖顺序发布五个包，并用自动生成的说明创建 GitHub Release。`workflow_dispatch` 手动触发时跳过 tag 校验。
 
+**不发版测试流水线。** 从 Actions 页手动运行 workflow 并勾选 **Dry run**（`workflow_dispatch` → `dry_run`）：所有步骤都会执行——包括 `pnpm -r publish --dry-run` 逐个打包验证——但不会真正发布到 npm、不会创建 Release，也不需要打 tag 或 bump 版本。
+
 **手动发布。** 也可以从本地 checkout 发布（先 `npm login`——你必须拥有 `@shlv` scope）：
 
 ```sh
