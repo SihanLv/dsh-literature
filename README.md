@@ -121,7 +121,7 @@ The tools keep model context lean: `literature_search` returns one line per pape
 - **The plugin fails to load after install** ("Cannot find module … `lib/error.js`"): the installed package is missing its runtime modules. Reinstall at the latest version (`dsh plugin --profile headless add @shlv/dsh-literature@<version>`); versions whose tarball ships only `lib/index.js` are broken.
 - **`dsh plugin add` installs an old version**: pnpm's registry metadata cache. Use an explicit version or `pnpm cache clean` (see [Install and lifecycle](#install-and-lifecycle)).
 - **A DOI-only paper reports `LITERATURE_FULLTEXT_UNAVAILABLE`**: the `subagents` service or the configured provider is absent, or the publisher blocks non-browser clients (dl.acm.org returns 403). Pass the explicit PDF URL in that case.
-- **arXiv full text is missing for an old paper**: the HTML5 rendering exists only for a subset of papers; the seam falls back to the PDF, which needs the publisher-side source.
+- **arXiv full text for an old paper**: the HTML5 rendering exists only for a subset of papers; the seam falls back to the PDF, which arXiv itself serves — no publisher involved. Papers without an arXiv preprint (dblp-only records) instead resolve the publisher PDF link, which bot walls can block.
 
 ## Development and verification
 

@@ -121,7 +121,7 @@ dsh plugin --profile headless add @shlv/dsh-literature@0.1.1
 - **安装后插件加载失败**（"Cannot find module … `lib/error.js`"）：安装的包缺少运行时模块。请重装最新版本（`dsh plugin --profile headless add @shlv/dsh-literature@<版本>`）；只打包 `lib/index.js` 的 tarball 是坏的。
 - **`dsh plugin add` 装到旧版本**：pnpm 的 registry 元数据缓存。用显式版本或 `pnpm cache clean`（见[安装与生命周期](#安装与生命周期)）。
 - **仅含 DOI 的论文报告 `LITERATURE_FULLTEXT_UNAVAILABLE`**：缺少 `subagents` 服务或配置的 provider，或发布商屏蔽非浏览器客户端（dl.acm.org 返回 403）。此时请传入显式 PDF URL。
-- **老论文的 arXiv 全文缺失**：HTML5 渲染仅对部分论文存在；seam 会回退到 PDF，而 PDF 需要发布商侧源码。
+- **老论文的 arXiv 全文**：HTML5 渲染仅对部分论文存在；seam 会回退到 arXiv 官方 PDF（由 arXiv 直接托管，不涉及发布商）。没有 arXiv 预印本的论文（仅 dblp 记录）才走发布商 PDF 链接，可能被机器人墙挡住。
 
 ## 开发与验证
 
