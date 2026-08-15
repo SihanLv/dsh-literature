@@ -8,6 +8,21 @@ English | [中文](README.zh.md)
 
 Install `@shlv/dsh-literature` into any profile (Web or Headless) and you get three model-facing tools: `literature_search`, `literature_bibtex`, and `literature_fulltext`.
 
+## Quick start
+
+```sh
+dsh plugin --profile headless add @shlv/dsh-literature
+dsh plugin --profile web add @shlv/dsh-literature
+```
+
+One command installs the whole family. From a source checkout with `DEEPSEEK_API_KEY` set, mount the repository patch instead:
+
+```sh
+cd deepseek-harness   # a dsh checkout
+pnpm dsh --profile headless --patch /path/to/dsh-literature/literature.patch.yml \
+  "search for 'Attention is all you need', fetch its BibTeX, then download the full text"
+```
+
 ## Why this exists
 
 Academic search splits across two databases with complementary coverage: **dblp** holds formal published records (plus CoRR mirrors of arXiv `cs.*` preprints), while **arXiv** holds preprints that dblp syncs with a lag. Asking the model to query both and reconcile the answers wastes tokens and produces inconsistent citations. This seam does the reconciliation once: dedupe, authoritative-source preference, and fallback are policy, not prompt engineering.
@@ -36,21 +51,6 @@ The family mirrors the DeepSeek Harness capability-seam pattern — Service Defi
 | `@shlv/dsh-literature-tool` | **Consumer**: the three model-facing tools, their schemas, presentation, and the publisher-PDF-link subagent fallback | `ctx.tools` |
 
 You only ever install the bundle; the other four are its dependencies. The two sources share one seam because they evolve independently: the full-text machinery (tar, pdf.js) must not drag the dblp provider, and a deployment that loads only one provider still gets a working search.
-
-## Quick start
-
-```sh
-dsh plugin --profile headless add @shlv/dsh-literature
-dsh plugin --profile web add @shlv/dsh-literature
-```
-
-One command installs the whole family. From a source checkout with `DEEPSEEK_API_KEY` set, mount the repository patch instead:
-
-```sh
-cd deepseek-harness   # a dsh checkout
-pnpm dsh --profile headless --patch /path/to/dsh-literature/literature.patch.yml \
-  "search for 'Attention is all you need', fetch its BibTeX, then download the full text"
-```
 
 ## Requirements
 

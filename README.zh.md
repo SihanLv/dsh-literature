@@ -8,6 +8,21 @@
 
 把 `@shlv/dsh-literature` 装入任意 profile（Web 或 Headless），即可获得三个面向模型的工具：`literature_search`、`literature_bibtex` 与 `literature_fulltext`。
 
+## 快速开始
+
+```sh
+dsh plugin --profile headless add @shlv/dsh-literature
+dsh plugin --profile web add @shlv/dsh-literature
+```
+
+一条命令装上整个系列。在带 `DEEPSEEK_API_KEY` 的源码 checkout 中，改用仓库自带 patch 挂载：
+
+```sh
+cd deepseek-harness   # 一个 dsh checkout
+pnpm dsh --profile headless --patch /path/to/dsh-literature/literature.patch.yml \
+  "搜索 'Attention is all you need'，获取其 BibTeX，再下载全文"
+```
+
 ## 为什么需要它
 
 学术检索分散在两个覆盖互补的数据库：**dblp** 收录正式发表的记录（外加 arXiv `cs.*` 预印本的 CoRR 镜像），**arXiv** 收录 dblp 同步滞后的预印本。让模型自己查两个库再对账，既浪费 token 又产生不一致的引用。这个 seam 一次性完成对账：去重、权威来源优先、回退，都是策略而非提示词工程。
@@ -36,21 +51,6 @@
 | `@shlv/dsh-literature-tool` | **消费方**：三个面向模型的工具、schema、呈现、出版商 PDF 链接的子代理回退 | `ctx.tools` |
 
 你只需安装 bundle，其余四个是它的依赖。两个来源共享一个 seam，因为它们独立演进：全文机制（tar、pdf.js）不能拖累 dblp 提供方，而且只加载一个提供方的部署仍能得到可用的搜索。
-
-## 快速开始
-
-```sh
-dsh plugin --profile headless add @shlv/dsh-literature
-dsh plugin --profile web add @shlv/dsh-literature
-```
-
-一条命令装上整个系列。在带 `DEEPSEEK_API_KEY` 的源码 checkout 中，改用仓库自带 patch 挂载：
-
-```sh
-cd deepseek-harness   # 一个 dsh checkout
-pnpm dsh --profile headless --patch /path/to/dsh-literature/literature.patch.yml \
-  "搜索 'Attention is all you need'，获取其 BibTeX，再下载全文"
-```
 
 ## 环境要求
 
