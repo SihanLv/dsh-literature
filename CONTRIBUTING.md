@@ -38,10 +38,11 @@ The standalone repository follows the published-plugin pattern (see `dsh-vision-
 
 ## Publishing
 
-Five packages publish in dependency order — `@shlv/dsh-literature-core` (the seam) first, then `@shlv/dsh-literature-dblp` and `@shlv/dsh-literature-arxiv`, then `@shlv/dsh-literature-tool`, and finally the `@shlv/dsh-literature` bundle:
+Five packages publish in dependency order — `@shlv/dsh-literature-core` (the seam) first, then `@shlv/dsh-literature-dblp` and `@shlv/dsh-literature-arxiv`, then `@shlv/dsh-literature-tool`, and finally the `@shlv/dsh-literature` bundle.
+
+Before the first release: `npm login` (you must own the `@shlv` scope), and pick a version for the whole family — all five packages share one version number, so bump them together (e.g. `pnpm -r version patch`, or edit the five `version` fields by hand). From the repository root:
 
 ```sh
-cd ~/dsh-literature
 cd literature-core && pnpm publish && cd ..    # ① seam
 cd literature-dblp && pnpm publish && cd ..    # ②
 cd literature-arxiv && pnpm publish && cd ..   # ③

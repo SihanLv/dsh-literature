@@ -38,10 +38,11 @@ pnpm run test         # vitest —— 221 个测试，含真实 API 的性能探
 
 ## 发布
 
-五个包按依赖顺序发布——先 `@shlv/dsh-literature-core`（seam），再 `@shlv/dsh-literature-dblp` 与 `@shlv/dsh-literature-arxiv`，然后 `@shlv/dsh-literature-tool`，最后发布 `@shlv/dsh-literature` bundle：
+五个包按依赖顺序发布——先 `@shlv/dsh-literature-core`（seam），再 `@shlv/dsh-literature-dblp` 与 `@shlv/dsh-literature-arxiv`，然后 `@shlv/dsh-literature-tool`，最后发布 `@shlv/dsh-literature` bundle。
+
+首次发布前：`npm login`（你必须拥有 `@shlv` scope），并为整个系列选定版本——五个包共享同一个版本号，需一起 bump（例如 `pnpm -r version patch`，或手工改五个 `version` 字段）。在仓库根目录执行：
 
 ```sh
-cd ~/dsh-literature
 cd literature-core && pnpm publish && cd ..    # ① seam
 cd literature-dblp && pnpm publish && cd ..    # ②
 cd literature-arxiv && pnpm publish && cd ..   # ③

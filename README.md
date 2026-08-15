@@ -20,7 +20,7 @@ Academic search splits across two databases with complementary coverage: **dblp*
 - **Stable ids the model can reuse.** Every merged record carries a synthetic `id` (`arxiv:…`, `dblp:…`, `doi:…`, `title:…`) the model can pass straight back to `literature_bibtex` / `literature_fulltext`.
 - **Precise title resolution.** Title queries pull the full dblp hit list plus a phrase-quoted arXiv search, then rerank by BM25 title similarity — the paper you meant wins even when a newer same-topic paper would sort first.
 - **Slow downloads never block a turn.** `literature_fulltext` runs as a background `ctx.jobs` job by default and returns a job id; `job_output` collects the result. Downloads that measure 25–60 s on publisher sites don't stall the agent loop.
-- **Hardened transport.** One SSRF-guarded HTTP layer for every request: URL hygiene, no embedded credentials, same-origin redirects with at most one cross-origin hop, byte caps, and cooperative deadlines.
+- **Hardened transport.** One HTTP layer for every request with URL hygiene, no embedded credentials, same-origin redirects with at most one cross-origin hop, byte caps, and cooperative deadlines.
 - **Polite by default.** Both providers serialize through a rate limiter (arXiv at its documented 3 s interval, with exponential backoff on 429/503); one throttled source never sinks a search.
 
 ## Architecture
@@ -54,9 +54,9 @@ pnpm dsh --profile headless --patch /path/to/dsh-literature/literature.patch.yml
 
 ## Requirements
 
-- DeepSeek Harness `0.1.0-rc.6` or a compatible later release (the plugin declares `@deepseek-ai/dsh-*` peers at that line).
+- DeepSeek Harness `0.1.0-rc.6` or a compatible later release (the plugin declares `@deepseek-ai/dsh-*` peers at that release line).
 - Node.js `^22.19` or `>=24`.
-- `literature_fulltext`'s background mode additionally needs `@deepseek-ai/dsh-jobs-local` and `@deepseek-ai/dsh-tool-jobs`.
+- `literature_fulltext`'s background mode uses `@deepseek-ai/dsh-jobs-local` and `@deepseek-ai/dsh-tool-jobs`, which the Harness profile base bundle provides by default (the headless and web profiles ship them); if your profile lacks them, add them with `dsh plugin add`.
 - The publisher-PDF fallback needs the `subagents` service with a provider supporting `outputSchema` (default `spawn`). Without it, DOI-only and landing-page inputs report `LITERATURE_FULLTEXT_UNAVAILABLE`; search, BibTeX, and arXiv full text still work.
 
 ## Install and lifecycle
@@ -79,9 +79,9 @@ dsh plugin --profile headless add @shlv/dsh-literature@0.1.1
 |---|---|
 | `literature_search` | Query dblp and arXiv, merge/dedupe, return records with stable ids, source-native titles, venues, DOIs, arXiv ids, and abstracts. |
 | `literature_bibtex` | Resolve a title, arXiv id, dblp key, or DOI to one BibTeX entry — formal dblp → arXiv `@misc` → dblp CoRR mirror — with a provenance note when the year is version-dependent. |
-| `literature_fulltext` | Acquire full text (arXiv source → HTML → PDF → publisher PDF via a subagent) and persist the extracted files into the session workspace under `literature/<id>/`. Background by default; returns the bounded summary plus file paths. |
+| `literature_fulltext` | Acquire full text: the arXiv source tarball → HTML → PDF, then — for papers without an arXiv preprint — the publisher PDF link via a subagent; an explicit PDF or landing-page URL is accepted directly. Persists the extracted files into the session workspace under `literature/<id>/`. Background by default; returns the bounded summary plus file paths. |
 
-Each tool takes one free-form `query` string; the seam recognizes whether it is a title, an arXiv id, a dblp key, a DOI, or a URL.
+Each tool takes one free-form `query` string; the seam recognizes titles, arXiv ids, dblp keys, DOIs, and URLs. `literature_bibtex` resolves titles, arXiv ids, dblp keys, and DOIs (a URL input is rejected); `literature_search` and `literature_fulltext` additionally accept URLs.
 
 ## Service API (`ctx.literature`)
 
@@ -91,7 +91,7 @@ Each tool takes one free-form `query` string; the seam recognizes whether it is 
 | `search(request, signal?)` | Run every selected available source in parallel and merge the normalized hits. |
 | `resolveRecord(input, signal?)` | Resolve a title, arXiv id, dblp key, CoRR key, or DOI into one merged record; exact identifiers win over fuzzy title matches. |
 | `bibtex(input, signal?)` | Select the most authoritative BibTeX entry (formal dblp → arXiv → CoRR mirror). |
-| `fulltext(input, signal?)` | Acquire full text in priority order (arXiv source → HTML → PDF → explicit PDF URL); throws `LITERATURE_FULLTEXT_UNAVAILABLE` when no artifact exists. |
+| `fulltext(input, signal?)` | Acquire full text in priority order (arXiv source → HTML → PDF → explicit PDF URL). A record without an arXiv preprint has no seam-level artifact and reports `LITERATURE_FULLTEXT_UNAVAILABLE`; the tool then resolves the publisher PDF link via `landingPage` and a subagent. |
 | `landingPage(input, signal?)` | Fetch a publisher landing page by DOI or URL and return bounded, minified HTML for PDF-link analysis. |
 
 ## Merge and fallback policy
@@ -99,7 +99,7 @@ Each tool takes one free-form `query` string; the seam recognizes whether it is 
 - **Dedupe** keys a paper by arXiv id (derived from the dblp CoRR key `journals/corr/abs-YYMM-NNNNN` when present), then publisher DOI, then normalized title. A differing DOI is not decisive: a CoRR mirror carries the arXiv DataCite DOI (`10.48550/…`) while its formal record carries the publisher DOI.
 - **Merge** prefers the formal dblp record's venue, year, DOI, and BibTeX, and retains the arXiv id from the CoRR mirror or the arXiv hit.
 - **BibTeX** prefers the formal dblp record; a still-unpublished preprint gets the arXiv `@misc` (citation-correct, unlike dblp's CoRR `@article`-in-`CoRR` artifact), with the dblp CoRR mirror as the last resort.
-- **Full text** prefers the arXiv LaTeX source tarball, then the arXiv HTML5, then the arXiv PDF, then an explicit PDF URL. A failed artifact kind falls through to the next one (a PDF-only submission whose `/e-print` serves a PDF still resolves through `/pdf`).
+- **Full text** prefers the arXiv LaTeX source tarball, then the arXiv HTML5, then the arXiv PDF, then an explicit PDF URL. A failed artifact kind falls through to the next one (a PDF-only submission whose `/e-print` serves a PDF still resolves through `/pdf`). A record without an arXiv id has no seam-level artifact; the tool resolves the publisher PDF link through a subagent.
 
 ## Configuration
 

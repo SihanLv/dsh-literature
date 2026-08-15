@@ -20,7 +20,7 @@
 - **模型可复用的稳定 id。** 每条合并记录携带合成 `id`（`arxiv:…`、`dblp:…`、`doi:…`、`title:…`），模型可直接回传给 `literature_bibtex` / `literature_fulltext`。
 - **精确的标题解析。** 标题查询拉取完整 dblp 命中列表加短语引号 arXiv 搜索，再按 BM25 标题相似度重排——即使有更新的同主题论文排在前，你要找的论文仍会胜出。
 - **慢下载不阻塞回合。** `literature_fulltext` 默认作为 `ctx.jobs` 后台任务运行并立即返回 job id，用 `job_output` 收集结果。发布商站点上实测 25–60 秒的下载不会拖住 agent 循环。
-- **加固的传输层。** 所有请求共享一层 SSRF 防护 HTTP：URL 卫生、禁止内嵌凭据、同源重定向且最多一次跨域跳转、字节上限、协作式超时。
+- **加固的传输层。** 所有请求共享一层加固的 HTTP：URL 卫生、禁止内嵌凭据、同源重定向且最多一次跨域跳转、字节上限、协作式超时。
 - **默认礼貌限流。** 两个提供方都通过限速器串行请求（arXiv 按其文档规定的 3 秒间隔，429/503 带指数退避）；单个被限流的来源不会拖垮整个搜索。
 
 ## 架构
@@ -35,7 +35,7 @@
 | `@shlv/dsh-literature-arxiv` | **arXiv 来源提供方**：Atom 搜索、精确 id 查找、BibTeX、全文产物下载 | 在 `ctx.literature` 注册来源 |
 | `@shlv/dsh-literature-tool` | **消费方**：三个面向模型的工具、schema、呈现、出版商 PDF 链接的子代理回退 | `ctx.tools` |
 
-你只需安装 bundle，其余四个是它的依赖。两个来源共享一个 dblp 优先策略的 seam，因为它们独立演进：全文机制（tar、pdf.js）不能拖累 dblp 提供方，而且只加载一个提供方的部署仍能得到可用的搜索。
+你只需安装 bundle，其余四个是它的依赖。两个来源共享一个 seam，因为它们独立演进：全文机制（tar、pdf.js）不能拖累 dblp 提供方，而且只加载一个提供方的部署仍能得到可用的搜索。
 
 ## 快速开始
 
@@ -56,7 +56,7 @@ pnpm dsh --profile headless --patch /path/to/dsh-literature/literature.patch.yml
 
 - DeepSeek Harness `0.1.0-rc.6` 或兼容的后续版本（插件在该版本线声明 `@deepseek-ai/dsh-*` peer）。
 - Node.js `^22.19` 或 `>=24`。
-- `literature_fulltext` 的后台模式还需要 `@deepseek-ai/dsh-jobs-local` 与 `@deepseek-ai/dsh-tool-jobs`。
+- `literature_fulltext` 的后台模式使用 `@deepseek-ai/dsh-jobs-local` 与 `@deepseek-ai/dsh-tool-jobs`——它们由 Harness 的 profile base bundle 默认提供（headless 与 web profile 自带）；若你的 profile 缺少，可用 `dsh plugin add` 安装。
 - 出版商 PDF 回退需要带支持 `outputSchema` 的 provider 的 `subagents` 服务（默认 `spawn`）。缺少时，仅含 DOI 与落地页的输入报告 `LITERATURE_FULLTEXT_UNAVAILABLE`；搜索、BibTeX 与 arXiv 全文仍可用。
 
 ## 安装与生命周期
@@ -79,9 +79,9 @@ dsh plugin --profile headless add @shlv/dsh-literature@0.1.1
 |---|---|
 | `literature_search` | 查询 dblp 与 arXiv，合并／去重，返回带稳定 id、源生标题、venue、DOI、arXiv id 与摘要的记录。 |
 | `literature_bibtex` | 将标题、arXiv id、dblp key 或 DOI 解析为一条 BibTeX 条目——正式 dblp → arXiv `@misc` → dblp CoRR 镜像；年份依赖版本时附来源说明。 |
-| `literature_fulltext` | 获取全文（arXiv 源码 → HTML → PDF → 经子代理的出版商 PDF）并把提取的文件写入会话工作区 `literature/<id>/`。默认后台运行；返回有界摘要与文件路径。 |
+| `literature_fulltext` | 获取全文：arXiv 源码包 → HTML → PDF，然后——对没有 arXiv 预印本的论文——经子代理解析发布商 PDF 链接；也直接接受显式 PDF 或落地页 URL。提取的文件写入会话工作区 `literature/<id>/`。默认后台运行；返回有界摘要与文件路径。 |
 
-每个工具接受一个自由形式的 `query` 字符串；seam 自动识别它是标题、arXiv id、dblp key、DOI 还是 URL。
+每个工具接受一个自由形式的 `query` 字符串；seam 能识别标题、arXiv id、dblp key、DOI 与 URL。`literature_bibtex` 解析标题、arXiv id、dblp key 与 DOI（拒绝 URL 输入）；`literature_search` 与 `literature_fulltext` 额外接受 URL。
 
 ## 服务 API（`ctx.literature`）
 
@@ -91,7 +91,7 @@ dsh plugin --profile headless add @shlv/dsh-literature@0.1.1
 | `search(request, signal?)` | 并行运行每个选中的可用来源并合并归一化命中。 |
 | `resolveRecord(input, signal?)` | 将标题、arXiv id、dblp key、CoRR key 或 DOI 解析为一条合并记录；精确标识符优先于模糊标题匹配。 |
 | `bibtex(input, signal?)` | 选择最权威的 BibTeX 条目（正式 dblp → arXiv → CoRR 镜像）。 |
-| `fulltext(input, signal?)` | 按优先级获取全文（arXiv 源码 → HTML → PDF → 显式 PDF URL）；无产物时抛 `LITERATURE_FULLTEXT_UNAVAILABLE`。 |
+| `fulltext(input, signal?)` | 按优先级获取全文（arXiv 源码 → HTML → PDF → 显式 PDF URL）。没有 arXiv 预印本的记录在 seam 层无产物，报告 `LITERATURE_FULLTEXT_UNAVAILABLE`；工具随后经 `landingPage` 与子代理解析发布商 PDF 链接。 |
 | `landingPage(input, signal?)` | 按 DOI 或 URL 抓取出版商落地页并返回有界、压缩后的 HTML 供 PDF 链接分析。 |
 
 ## 合并与回退策略
@@ -99,7 +99,7 @@ dsh plugin --profile headless add @shlv/dsh-literature@0.1.1
 - **去重**按 arXiv id（存在时从 dblp CoRR key `journals/corr/abs-YYMM-NNNNN` 反推）、其次出版商 DOI、最后归一化标题识别同一篇论文。DOI 不同不是决定性的：CoRR 镜像携带 arXiv DataCite DOI（`10.48550/…`），而正式记录携带出版商 DOI。
 - **合并**优先正式 dblp 记录的 venue／year／DOI／BibTeX，并从 CoRR 镜像或 arXiv 命中保留 arXiv id。
 - **BibTeX** 优先正式 dblp 记录；尚未发表的预印本取 arXiv `@misc`（引用形态正确，不同于 dblp CoRR 的 `@article`-in-`CoRR` 伪产物），dblp CoRR 镜像仅作最后兜底。
-- **全文**优先 arXiv LaTeX 源码包、其次 arXiv HTML5、再次 arXiv PDF、最后显式 PDF URL。某个产物种类失败会落到下一种（纯 PDF 提交的论文其 `/e-print` 返回 PDF 时，仍会经 `/pdf` 解析成功）。
+- **全文**优先 arXiv LaTeX 源码包、其次 arXiv HTML5、再次 arXiv PDF、最后显式 PDF URL。某个产物种类失败会落到下一种（纯 PDF 提交的论文其 `/e-print` 返回 PDF 时，仍会经 `/pdf` 解析成功）。没有 arXiv id 的记录在 seam 层无产物；工具经子代理解析发布商 PDF 链接。
 
 ## 配置
 
