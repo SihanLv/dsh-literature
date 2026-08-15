@@ -1,7 +1,7 @@
 {
   "name": "@shlv/dsh-literature-tool",
   "description": "Model-facing literature tools (literature_search / literature_bibtex / literature_fulltext) over the literature seam",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publishConfig": {
     "access": "public"
   },
@@ -25,9 +25,7 @@
     "./package.json": "./package.json"
   },
   "files": [
-    "lib/index.js",
-    "lib/invariant.js",
-    "lib/types/**/*.d.ts"
+    "lib"
   ],
   "license": "MIT",
   "peerDependencies": {

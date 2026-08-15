@@ -1,7 +1,7 @@
 {
   "name": "@shlv/dsh-literature-dblp",
   "description": "DBLP source provider for the literature seam: search, per-record BibTeX, metadata, and the CoRR↔arXiv key bridge",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publishConfig": {
     "access": "public"
   },
@@ -25,9 +25,7 @@
     "./package.json": "./package.json"
   },
   "files": [
-    "lib/index.js",
-    "lib/invariant.js",
-    "lib/types/**/*.d.ts"
+    "lib"
   ],
   "license": "MIT",
   "peerDependencies": {
