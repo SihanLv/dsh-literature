@@ -124,6 +124,10 @@ pnpm run test         # vitest —— 221 个测试，含真实 API 的性能探
 
 五个包按依赖顺序发布：先 `@shlv/dsh-literature-core`（seam），再 `@shlv/dsh-literature-dblp` 与 `@shlv/dsh-literature-arxiv`，然后 `@shlv/dsh-literature-tool`，最后发布 `@shlv/dsh-literature` bundle——每次 `pnpm publish` 都会运行 `prepack` 构建，并把包间 `workspace:^` 说明改写为发布版本。本仓库的 `deepseek-harness/packages/literature` 快照与主 checkout 需要手动保持同步。
 
+**发布前**，在每个包内运行 `npm pack --dry-run`，确认 tarball 携带完整的 `lib/` 树。tsc 构建是每个源码模块一个 js（`lib/error.js`、`lib/merge.js`、…），因此 `files` 必须是 `["lib"]`——主仓库基于 tsdown 的单文件白名单会发布一个运行时无法加载的 tarball（`0.1.0` 正是因此损坏）。
+
+**发布新版本后**，`dsh plugin add` 可能仍装到旧版本，因为 pnpm 会缓存 registry 元数据。请用显式版本安装（`dsh plugin add @shlv/dsh-literature@0.1.1`），或先清元数据缓存（`pnpm cache clean`）。
+
 ## 已知限制
 
 - **发布商机器人墙**：dl.acm.org 对非浏览器客户端返回 403，ACM-DL 的 DOI 会在落地页抓取阶段失败。

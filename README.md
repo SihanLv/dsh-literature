@@ -124,6 +124,10 @@ This standalone repository follows the published-plugin pattern (see `dsh-vision
 
 Five packages publish in dependency order: `@shlv/dsh-literature-core` (the seam) first, then `@shlv/dsh-literature-dblp` and `@shlv/dsh-literature-arxiv`, then `@shlv/dsh-literature-tool`, and finally the `@shlv/dsh-literature` bundle — each `pnpm publish` runs its `prepack` build and rewrites inter-package `workspace:^` specs to the released version. The standalone snapshot of `deepseek-harness/packages/literature` and the main checkout must be kept in sync manually.
 
+**Before publishing**, run `npm pack --dry-run` in each package and confirm the tarball carries the whole `lib/` tree. The tsc build emits one js file per source module (`lib/error.js`, `lib/merge.js`, …), so `files` must be `["lib"]` — the single-file whitelist of the tsdown-based main repo would ship a tarball that fails to load at runtime (that is exactly what broke `0.1.0`).
+
+**After publishing a new version**, `dsh plugin add` may still install the previous one because pnpm caches registry metadata. Install with an explicit version (`dsh plugin add @shlv/dsh-literature@0.1.1`) or clear the metadata cache first (`pnpm cache clean`).
+
 ## Known limitations
 
 - **Publisher bot walls**: dl.acm.org returns 403 to non-browser clients, so ACM-DL DOIs fail at the landing-page fetch.
