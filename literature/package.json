@@ -1,7 +1,23 @@
 {
-  "name": "@shlv/dsh-literature-core",
-  "description": "Literature research capability seam (ctx.literature) for the DeepSeek Harness — dblp/arXiv source registry, merge/dedupe/fallback policy, record resolution, full-text strategy, and the LiteratureError taxonomy",
+  "name": "@shlv/dsh-literature",
   "version": "0.1.0",
+  "description": "Install bundle for the @shlv/dsh-literature family: one `dsh plugin add` installs the seam (ctx.literature), the dblp and arXiv providers, and the model-facing tools.",
+  "type": "module",
+  "files": [
+    "cordis.patch.yml",
+    "README.md"
+  ],
+  "dependencies": {
+    "@shlv/dsh-literature-core": "workspace:^",
+    "@shlv/dsh-literature-dblp": "workspace:^",
+    "@shlv/dsh-literature-arxiv": "workspace:^",
+    "@shlv/dsh-literature-tool": "workspace:^"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
   "publishConfig": {
     "access": "public"
   },
@@ -9,49 +25,5 @@
     "type": "git",
     "url": "git+https://github.com/SihanLv/dsh-literature.git"
   },
-  "type": "module",
-  "main": "lib/index.js",
-  "types": "lib/types/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./lib/types/index.d.ts",
-      "default": "./lib/index.js"
-    },
-    "./invariant": {
-      "types": "./lib/types/invariant.d.ts",
-      "default": "./lib/invariant.js"
-    },
-    "./src/*": "./src/*",
-    "./package.json": "./package.json"
-  },
-  "files": [
-    "lib/index.js",
-    "lib/invariant.js",
-    "lib/types/**/*.d.ts"
-  ],
-  "license": "MIT",
-  "peerDependencies": {
-    "@deepseek-ai/cordis": "^4.0.1",
-    "@deepseek-ai/dsh-invariants": "^0.1.0-rc.6",
-    "@deepseek-ai/dsh-timeout": "^0.1.0-rc.6"
-  },
-  "dependencies": {
-    "@deepseek-ai/schemastery": "^3.18.1",
-    "@joplin/turndown-plugin-gfm": "^1.0.67",
-    "node-html-parser": "^9.0.1",
-    "pdfjs-dist": "^6.2.108",
-    "tar": "^7.5.22",
-    "turndown": "^7.2.4"
-  },
-  "devDependencies": {
-    "@deepseek-ai/cordis": "4.0.1",
-    "@deepseek-ai/dsh-invariants": "0.1.0-rc.6",
-    "@deepseek-ai/dsh-timeout": "0.1.0-rc.6",
-    "@types/turndown": "^5.0.6"
-  },
-  "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "test": "vitest run tests",
-    "prepack": "npm run build"
-  }
+  "license": "MIT"
 }

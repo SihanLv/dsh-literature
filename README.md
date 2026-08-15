@@ -29,11 +29,11 @@ The family mirrors the DeepSeek Harness capability-seam pattern — Service Defi
 
 | Package | Role | Registers |
 |---|---|---|
-| [`bundle/`](bundle/package.json) | **Install bundle** `@shlv/dsh-literature`: the one package users `dsh plugin add`; declares the four functional packages and ships the patch that mounts them | profile bundle layer |
-| [`literature/`](literature/README.md) | **Service Definition** `@shlv/dsh-literature-core` (`ctx.literature`): source registry, merge/dedupe/fallback policy, record resolution, full-text strategy, shared HTTP transport, extraction helpers, `LiteratureError` taxonomy | `ctx.literature` |
+| [`literature/`](literature/package.json) | **Install bundle** `@shlv/dsh-literature`: the one package users `dsh plugin add`; declares the four functional packages and ships the patch that mounts them | profile bundle layer |
+| [`literature-core/`](literature-core/README.md) | **Service Definition** `@shlv/dsh-literature-core` (`ctx.literature`): source registry, merge/dedupe/fallback policy, record resolution, full-text strategy, shared HTTP transport, extraction helpers, `LiteratureError` taxonomy | `ctx.literature` |
 | [`literature-dblp/`](literature-dblp/README.md) | **dblp source provider** `@shlv/dsh-literature-dblp`: search API, record XML lookup, per-record BibTeX, CoRR↔arXiv key bridge | registers a source on `ctx.literature` |
 | [`literature-arxiv/`](literature-arxiv/README.md) | **arXiv source provider** `@shlv/dsh-literature-arxiv`: Atom search, exact-id lookup, BibTeX, full-text artifact download | registers a source on `ctx.literature` |
-| [`tool-literature/`](tool-literature/README.md) | **Consumer** `@shlv/dsh-literature-tool`: the three model-facing tools, their schemas, presentation, and the publisher-PDF-link subagent fallback | `ctx.tools` |
+| [`literature-tool/`](literature-tool/README.md) | **Consumer** `@shlv/dsh-literature-tool`: the three model-facing tools, their schemas, presentation, and the publisher-PDF-link subagent fallback | `ctx.tools` |
 
 The two sources share one seam with a dblp-preferred policy because they evolve independently: the full-text machinery (tar, pdf.js) must not drag the dblp provider, and a deployment that loads only one provider still gets a working search.
 

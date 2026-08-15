@@ -1,6 +1,6 @@
 # Mount the literature capability family on top of a dsh profile (source
 # development; the published @shlv/dsh-literature bundle ships the same rows
-# as bundle/cordis.patch.yml).
+# as literature/cordis.patch.yml).
 #
 # Usage (from this repo root, with DEEPSEEK_API_KEY in the environment or
 # root .env):

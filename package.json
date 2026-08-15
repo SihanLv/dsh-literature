@@ -5,8 +5,8 @@
   "description": "Standalone repository for the @shlv/dsh-literature-core family: the literature research capability seam (dblp + arXiv) plus its model-facing tools. Host dependencies (@deepseek-ai/dsh-*, cordis, schemastery) resolve through npm; the four literature packages link as a local workspace.",
   "type": "module",
   "scripts": {
-    "build": "tsc -p literature/tsconfig.json && tsc -p literature-dblp/tsconfig.json && tsc -p literature-arxiv/tsconfig.json && tsc -p tool-literature/tsconfig.json",
-    "typecheck": "tsc -p literature/tsconfig.json && tsc -p literature-dblp/tsconfig.json --noEmit && tsc -p literature-arxiv/tsconfig.json --noEmit && tsc -p tool-literature/tsconfig.json --noEmit",
+    "build": "tsc -p literature-core/tsconfig.json && tsc -p literature-dblp/tsconfig.json && tsc -p literature-arxiv/tsconfig.json && tsc -p literature-tool/tsconfig.json",
+    "typecheck": "tsc -p literature-core/tsconfig.json && tsc -p literature-dblp/tsconfig.json --noEmit && tsc -p literature-arxiv/tsconfig.json --noEmit && tsc -p literature-tool/tsconfig.json --noEmit",
     "test": "vitest run"
   },
   "devDependencies": {

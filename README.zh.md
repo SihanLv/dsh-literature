@@ -29,11 +29,11 @@
 
 | 包 | 角色 | 注册点 |
 |---|---|---|
-| [`bundle/`](bundle/package.json) | **安装 bundle** `@shlv/dsh-literature`：用户 `dsh plugin add` 的唯一入口；声明四个功能包并携带挂载它们的 patch | profile bundle 层 |
-| [`literature/`](literature/README.md) | **服务定义** `@shlv/dsh-literature-core`（`ctx.literature`）：来源注册表、合并／去重／回退策略、记录解析、全文策略、共享 HTTP 传输、提取辅助、`LiteratureError` 分类 | `ctx.literature` |
+| [`literature/`](literature/package.json) | **安装 bundle** `@shlv/dsh-literature`：用户 `dsh plugin add` 的唯一入口；声明四个功能包并携带挂载它们的 patch | profile bundle 层 |
+| [`literature-core/`](literature-core/README.md) | **服务定义** `@shlv/dsh-literature-core`（`ctx.literature`）：来源注册表、合并／去重／回退策略、记录解析、全文策略、共享 HTTP 传输、提取辅助、`LiteratureError` 分类 | `ctx.literature` |
 | [`literature-dblp/`](literature-dblp/README.md) | **dblp 来源提供方** `@shlv/dsh-literature-dblp`：搜索 API、记录 XML 查找、按记录 BibTeX、CoRR↔arXiv key 桥 | 在 `ctx.literature` 注册来源 |
 | [`literature-arxiv/`](literature-arxiv/README.md) | **arXiv 来源提供方** `@shlv/dsh-literature-arxiv`：Atom 搜索、精确 id 查找、BibTeX、全文产物下载 | 在 `ctx.literature` 注册来源 |
-| [`tool-literature/`](tool-literature/README.md) | **消费方** `@shlv/dsh-literature-tool`：三个面向模型的工具、schema、呈现、出版商 PDF 链接的子代理回退 | `ctx.tools` |
+| [`literature-tool/`](literature-tool/README.md) | **消费方** `@shlv/dsh-literature-tool`：三个面向模型的工具、schema、呈现、出版商 PDF 链接的子代理回退 | `ctx.tools` |
 
 两个来源共享一个 dblp 优先策略的 seam，因为它们独立演进：全文机制（tar、pdf.js）不能拖累 dblp 提供方，而且只加载一个提供方的部署仍能得到可用的搜索。
 

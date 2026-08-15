@@ -1,9 +1,9 @@
 packages:
-- bundle
 - literature
+- literature-core
 - literature-dblp
 - literature-arxiv
-- tool-literature
+- literature-tool
 allowBuilds:
   esbuild: true
   koffi: true

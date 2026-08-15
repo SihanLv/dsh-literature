@@ -18,22 +18,41 @@ importers:
         specifier: ^4.1.8
         version: 4.1.10(@types/node@22.20.1)(vite@8.2.1(@types/node@22.20.1))
 
-  bundle:
+  literature:
     dependencies:
       '@shlv/dsh-literature-arxiv':
         specifier: workspace:^
         version: link:../literature-arxiv
       '@shlv/dsh-literature-core':
         specifier: workspace:^
-        version: link:../literature
+        version: link:../literature-core
       '@shlv/dsh-literature-dblp':
         specifier: workspace:^
         version: link:../literature-dblp
       '@shlv/dsh-literature-tool':
         specifier: workspace:^
-        version: link:../tool-literature
+        version: link:../literature-tool
 
-  literature:
+  literature-arxiv:
+    dependencies:
+      '@deepseek-ai/schemastery':
+        specifier: ^3.18.1
+        version: 3.18.1
+      fast-xml-parser:
+        specifier: ^5.2.5
+        version: 5.10.1
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: 4.0.1
+        version: 4.0.1(@deepseek-ai/cordis-plugin-include@1.0.6)(@deepseek-ai/cordis-plugin-loader@1.0.2)
+      '@deepseek-ai/dsh-invariants':
+        specifier: 0.1.0-rc.6
+        version: 0.1.0-rc.6(@deepseek-ai/cordis@4.0.1)
+      '@shlv/dsh-literature-core':
+        specifier: workspace:^
+        version: link:../literature-core
+
+  literature-core:
     dependencies:
       '@deepseek-ai/schemastery':
         specifier: ^3.18.1
@@ -67,25 +86,6 @@ importers:
         specifier: ^5.0.6
         version: 5.0.6
 
-  literature-arxiv:
-    dependencies:
-      '@deepseek-ai/schemastery':
-        specifier: ^3.18.1
-        version: 3.18.1
-      fast-xml-parser:
-        specifier: ^5.2.5
-        version: 5.10.1
-    devDependencies:
-      '@deepseek-ai/cordis':
-        specifier: 4.0.1
-        version: 4.0.1(@deepseek-ai/cordis-plugin-include@1.0.6)(@deepseek-ai/cordis-plugin-loader@1.0.2)
-      '@deepseek-ai/dsh-invariants':
-        specifier: 0.1.0-rc.6
-        version: 0.1.0-rc.6(@deepseek-ai/cordis@4.0.1)
-      '@shlv/dsh-literature-core':
-        specifier: workspace:^
-        version: link:../literature
-
   literature-dblp:
     dependencies:
       '@deepseek-ai/schemastery':
@@ -100,9 +100,9 @@ importers:
         version: 0.1.0-rc.6(@deepseek-ai/cordis@4.0.1)
       '@shlv/dsh-literature-core':
         specifier: workspace:^
-        version: link:../literature
+        version: link:../literature-core
 
-  tool-literature:
+  literature-tool:
     dependencies:
       '@deepseek-ai/schemastery':
         specifier: ^3.18.1
@@ -155,7 +155,7 @@ importers:
         version: 0.1.0-rc.6(f8724372086ccc1457fc84e7becee2e0)
       '@shlv/dsh-literature-core':
         specifier: workspace:^
-        version: link:../literature
+        version: link:../literature-core
 
 packages:
 
