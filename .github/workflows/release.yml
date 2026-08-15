@@ -74,9 +74,10 @@ jobs:
         run: |
           # Regression guard for the 0.1.0 incident: the tsc build emits one
           # js per source module and `files` must be ["lib"], so each tarball
-          # must contain more than just lib/index.js.
+          # must contain more than just lib/index.js. npm writes its
+          # "npm notice" listing to stderr, so both streams must be counted.
           for dir in literature-core literature-dblp literature-arxiv literature-tool; do
-            count=$(cd "$dir" && npm pack --dry-run 2>/dev/null | grep -c 'lib/.*\.js')
+            count=$(cd "$dir" && npm pack --dry-run 2>&1 | grep -c 'lib/.*\.js')
             echo "$dir: $count runtime js files in tarball"
             if [ "$count" -lt 3 ]; then
               echo "ERROR: $dir tarball is missing runtime modules (files whitelist regression?)" >&2
