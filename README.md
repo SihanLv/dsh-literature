@@ -1,4 +1,4 @@
-# @shlv/dsh-literature — Literature Research for DeepSeek Harness
+# dsh-literature — Literature Research for DeepSeek Harness
 
 English | [中文](README.zh.md)
 

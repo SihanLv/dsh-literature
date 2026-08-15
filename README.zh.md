@@ -1,4 +1,4 @@
-# @shlv/dsh-literature — DeepSeek Harness 文献调研插件
+# dsh-literature — DeepSeek Harness 文献调研插件
 
 [English](README.md) | 中文
 
@@ -129,7 +129,7 @@ dsh plugin --profile headless add @shlv/dsh-literature@0.1.1
 pnpm install && pnpm run build && pnpm run typecheck && pnpm run test
 ```
 
-仓库布局、依赖策略、发布流程与完整验证清单见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+仓库布局、依赖策略、发布流程与完整验证清单见 [CONTRIBUTING.zh.md](CONTRIBUTING.zh.md)。
 
 ## 已知限制
 
