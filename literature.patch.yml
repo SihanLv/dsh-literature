@@ -1,0 +1,24 @@
+# Mount the literature capability family on top of a dsh profile.
+#
+# Usage (from the repo root, with DEEPSEEK_API_KEY in the environment or
+# root .env):
+#
+#   pnpm dsh --profile headless --patch packages/literature/literature.patch.yml \
+#     "用 literature_search 搜索 Attention is all you need，然后获取全文"
+#
+# The base bundle already carries the subagents service with the spawn/fork
+# providers (for the publisher-PDF-link fallback), jobs-local + tool-jobs
+# (for literature_fulltext's background-by-default mode), and the DeepSeek
+# adapter; this layer only inserts the four literature packages.
+- insert:
+    - id: literature
+      name: '@shlv/dsh-literature'
+
+    - id: literature-dblp
+      name: '@shlv/dsh-literature-dblp'
+
+    - id: literature-arxiv
+      name: '@shlv/dsh-literature-arxiv'
+
+    - id: tool-literature
+      name: '@shlv/dsh-tool-literature'

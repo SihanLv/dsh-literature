@@ -1,0 +1,28 @@
+{
+  // Standalone-repository base for the literature family: dependency types
+  // resolve through node_modules (registry versions), unlike the main
+  // deepseek-harness base, whose `paths` map every @deepseek-ai/dsh-* name to
+  // workspace source. Mirror the main base's compiler settings so the four
+  // package tsconfigs keep identical strictness.
+  "compilerOptions": {
+    "target": "es2024",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "declaration": true,
+    "sourceMap": true,
+    "declarationMap": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true,
+    "verbatimModuleSyntax": false,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "types": ["node"]
+  }
+}

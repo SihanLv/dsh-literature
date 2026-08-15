@@ -1,0 +1,8 @@
+packages:
+- literature
+- literature-dblp
+- literature-arxiv
+- tool-literature
+allowBuilds:
+  esbuild: true
+  koffi: true
