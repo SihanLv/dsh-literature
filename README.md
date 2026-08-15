@@ -6,7 +6,7 @@ English | [中文](README.zh.md)
 
 **One query across dblp and arXiv.** The literature research capability for DeepSeek Harness: search both sources, get one merged record per paper, the most authoritative BibTeX available, and full text when it exists — without the model ever juggling two databases itself.
 
-This is the standalone repository of the literature family: four functional packages behind one installable bundle. Installing `@shlv/dsh-literature` with `dsh plugin add` brings the whole family into any profile (Web or Headless) and ships three model-facing tools: `literature_search`, `literature_bibtex`, and `literature_fulltext`.
+Install `@shlv/dsh-literature` into any profile (Web or Headless) and you get three model-facing tools: `literature_search`, `literature_bibtex`, and `literature_fulltext`.
 
 ## Why this exists
 
@@ -29,24 +29,22 @@ The family mirrors the DeepSeek Harness capability-seam pattern — Service Defi
 
 | Package | Role | Registers |
 |---|---|---|
-| [`literature/`](literature/package.json) | **Install bundle** `@shlv/dsh-literature`: the one package users `dsh plugin add`; declares the four functional packages and ships the patch that mounts them | profile bundle layer |
-| [`literature-core/`](literature-core/README.md) | **Service Definition** `@shlv/dsh-literature-core` (`ctx.literature`): source registry, merge/dedupe/fallback policy, record resolution, full-text strategy, shared HTTP transport, extraction helpers, `LiteratureError` taxonomy | `ctx.literature` |
-| [`literature-dblp/`](literature-dblp/README.md) | **dblp source provider** `@shlv/dsh-literature-dblp`: search API, record XML lookup, per-record BibTeX, CoRR↔arXiv key bridge | registers a source on `ctx.literature` |
-| [`literature-arxiv/`](literature-arxiv/README.md) | **arXiv source provider** `@shlv/dsh-literature-arxiv`: Atom search, exact-id lookup, BibTeX, full-text artifact download | registers a source on `ctx.literature` |
-| [`literature-tool/`](literature-tool/README.md) | **Consumer** `@shlv/dsh-literature-tool`: the three model-facing tools, their schemas, presentation, and the publisher-PDF-link subagent fallback | `ctx.tools` |
+| `@shlv/dsh-literature` (bundle) | **Install bundle**: the one package you `dsh plugin add`; depends on the four functional packages and ships the patch that mounts them | profile bundle layer |
+| `@shlv/dsh-literature-core` | **Service Definition** (`ctx.literature`): source registry, merge/dedupe/fallback policy, record resolution, full-text strategy, shared HTTP transport, extraction helpers, `LiteratureError` taxonomy | `ctx.literature` |
+| `@shlv/dsh-literature-dblp` | **dblp source provider**: search API, record XML lookup, per-record BibTeX, CoRR↔arXiv key bridge | registers a source on `ctx.literature` |
+| `@shlv/dsh-literature-arxiv` | **arXiv source provider**: Atom search, exact-id lookup, BibTeX, full-text artifact download | registers a source on `ctx.literature` |
+| `@shlv/dsh-literature-tool` | **Consumer**: the three model-facing tools, their schemas, presentation, and the publisher-PDF-link subagent fallback | `ctx.tools` |
 
-The two sources share one seam with a dblp-preferred policy because they evolve independently: the full-text machinery (tar, pdf.js) must not drag the dblp provider, and a deployment that loads only one provider still gets a working search.
+You only ever install the bundle; the other four are its dependencies. The two sources share one seam because they evolve independently: the full-text machinery (tar, pdf.js) must not drag the dblp provider, and a deployment that loads only one provider still gets a working search.
 
 ## Quick start
-
-Install the bundle into any profile — one command brings the whole family:
 
 ```sh
 dsh plugin --profile headless add @shlv/dsh-literature
 dsh plugin --profile web add @shlv/dsh-literature
 ```
 
-The bundle depends on the four functional packages (`-core`, `-dblp`, `-arxiv`, `-tool`), so pnpm installs them together and the bundle's patch inserts all four plugin rows. While developing from source, mount the family with the repository patch instead:
+One command installs the whole family. From a source checkout with `DEEPSEEK_API_KEY` set, mount the repository patch instead:
 
 ```sh
 cd deepseek-harness   # a dsh checkout
@@ -54,7 +52,26 @@ pnpm dsh --profile headless --patch /path/to/dsh-literature/literature.patch.yml
   "search for 'Attention is all you need', fetch its BibTeX, then download the full text"
 ```
 
-`literature_fulltext`'s background mode additionally needs `@deepseek-ai/dsh-jobs-local` and `@deepseek-ai/dsh-tool-jobs`; the publisher-PDF fallback needs the `subagents` service with a provider supporting `outputSchema` (default `spawn`).
+## Requirements
+
+- DeepSeek Harness `0.1.0-rc.6` or a compatible later release (the plugin declares `@deepseek-ai/dsh-*` peers at that line).
+- Node.js `^22.19` or `>=24`.
+- `literature_fulltext`'s background mode additionally needs `@deepseek-ai/dsh-jobs-local` and `@deepseek-ai/dsh-tool-jobs`.
+- The publisher-PDF fallback needs the `subagents` service with a provider supporting `outputSchema` (default `spawn`). Without it, DOI-only and landing-page inputs report `LITERATURE_FULLTEXT_UNAVAILABLE`; search, BibTeX, and arXiv full text still work.
+
+## Install and lifecycle
+
+```sh
+dsh plugin --profile headless add @shlv/dsh-literature      # install
+dsh plugin --profile headless remove @shlv/dsh-literature   # uninstall
+```
+
+**Upgrading.** After a new release, `dsh plugin add` may still install the previous version because pnpm caches registry metadata. Install with an explicit version, or clear the metadata cache first:
+
+```sh
+dsh plugin --profile headless add @shlv/dsh-literature@0.1.1
+# or: pnpm cache clean
+```
 
 ## Tools
 
@@ -99,34 +116,20 @@ Each package accepts validated config through its cordis.yml row; every value is
 
 The tools keep model context lean: `literature_search` returns one line per paper with a truncation footer, `literature_bibtex` one fenced block plus an optional note, and `literature_fulltext` a bounded summary with the extracted bodies written to disk rather than echoed into the prompt. The seam contributes no prompt or schema itself; the consumer owns every model-visible string.
 
-## Development
+## Troubleshooting
+
+- **The plugin fails to load after install** ("Cannot find module … `lib/error.js`"): the installed package is missing its runtime modules. Reinstall at the latest version (`dsh plugin --profile headless add @shlv/dsh-literature@<version>`); versions whose tarball ships only `lib/index.js` are broken.
+- **`dsh plugin add` installs an old version**: pnpm's registry metadata cache. Use an explicit version or `pnpm cache clean` (see [Install and lifecycle](#install-and-lifecycle)).
+- **A DOI-only paper reports `LITERATURE_FULLTEXT_UNAVAILABLE`**: the `subagents` service or the configured provider is absent, or the publisher blocks non-browser clients (dl.acm.org returns 403). Pass the explicit PDF URL in that case.
+- **arXiv full text is missing for an old paper**: the HTML5 rendering exists only for a subset of papers; the seam falls back to the PDF, which needs the publisher-side source.
+
+## Development and verification
 
 ```sh
-pnpm install          # installs host dev deps from npm; the five packages link as a workspace
-pnpm run build        # tsc, package order: core → providers → tool (the bundle has no src)
-pnpm run typecheck    # core first, then --noEmit on the dependents
-pnpm run test         # vitest — 221 tests, including live-API perf probes
+pnpm install && pnpm run build && pnpm run typecheck && pnpm run test
 ```
 
-`vitest.config.ts` aliases the functional packages to their `src` so tests exercise source without a prior build; `tsc` resolves inter-package types through each package's built `lib/types`.
-
-## Dependency strategy
-
-This standalone repository follows the published-plugin pattern (see `dsh-vision-toolkit`):
-
-- **Host dependencies are peers.** `@deepseek-ai/dsh-*` (`^0.1.0-rc.6`), `@deepseek-ai/cordis` (`^4.0.1`), and `@deepseek-ai/schemastery` (`^3.18.1`) are supplied by the Harness runtime that loads the plugin; the packages never install their own copy.
-- **The bundle is the install surface.** `@shlv/dsh-literature` declares the four functional packages as `dependencies`, so `dsh plugin add @shlv/dsh-literature` installs the whole family at once.
-- **Inter-package references use `workspace:^`.** The functional packages link as one pnpm workspace; `pnpm publish` rewrites `workspace:` specs to the released version automatically.
-- **Dev dependencies pin registry versions** so `pnpm install && pnpm run test` works standalone.
-- **Source resolution stays local.** Tests alias to `src`; the build order (core first) feeds each dependent's `lib/types`.
-
-## Publishing
-
-Five packages publish in dependency order: `@shlv/dsh-literature-core` (the seam) first, then `@shlv/dsh-literature-dblp` and `@shlv/dsh-literature-arxiv`, then `@shlv/dsh-literature-tool`, and finally the `@shlv/dsh-literature` bundle — each `pnpm publish` runs its `prepack` build and rewrites inter-package `workspace:^` specs to the released version. The standalone snapshot of `deepseek-harness/packages/literature` and the main checkout must be kept in sync manually.
-
-**Before publishing**, run `npm pack --dry-run` in each package and confirm the tarball carries the whole `lib/` tree. The tsc build emits one js file per source module (`lib/error.js`, `lib/merge.js`, …), so `files` must be `["lib"]` — the single-file whitelist of the tsdown-based main repo would ship a tarball that fails to load at runtime (that is exactly what broke `0.1.0`).
-
-**After publishing a new version**, `dsh plugin add` may still install the previous one because pnpm caches registry metadata. Install with an explicit version (`dsh plugin add @shlv/dsh-literature@0.1.1`) or clear the metadata cache first (`pnpm cache clean`).
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the repository layout, dependency strategy, release procedure, and the full verification checklist.
 
 ## Known limitations
 

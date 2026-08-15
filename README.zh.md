@@ -6,7 +6,7 @@
 
 **一次查询，同时覆盖 dblp 与 arXiv。** 面向 DeepSeek Harness 的文献调研能力：同时检索两个数据库，每篇论文只返回一条合并记录，取到最权威的 BibTeX，以及存在的全文——模型无需自己在两库之间来回切换。
 
-这是文献插件系列的独立仓库：四个功能包 + 一个可安装的聚合 bundle。用 `dsh plugin add` 安装 `@shlv/dsh-literature` 即可把整个系列装入任意 DeepSeek Harness profile（Web 或 Headless），并获得三个面向模型的工具：`literature_search`、`literature_bibtex` 与 `literature_fulltext`。
+把 `@shlv/dsh-literature` 装入任意 profile（Web 或 Headless），即可获得三个面向模型的工具：`literature_search`、`literature_bibtex` 与 `literature_fulltext`。
 
 ## 为什么需要它
 
@@ -29,24 +29,22 @@
 
 | 包 | 角色 | 注册点 |
 |---|---|---|
-| [`literature/`](literature/package.json) | **安装 bundle** `@shlv/dsh-literature`：用户 `dsh plugin add` 的唯一入口；声明四个功能包并携带挂载它们的 patch | profile bundle 层 |
-| [`literature-core/`](literature-core/README.md) | **服务定义** `@shlv/dsh-literature-core`（`ctx.literature`）：来源注册表、合并／去重／回退策略、记录解析、全文策略、共享 HTTP 传输、提取辅助、`LiteratureError` 分类 | `ctx.literature` |
-| [`literature-dblp/`](literature-dblp/README.md) | **dblp 来源提供方** `@shlv/dsh-literature-dblp`：搜索 API、记录 XML 查找、按记录 BibTeX、CoRR↔arXiv key 桥 | 在 `ctx.literature` 注册来源 |
-| [`literature-arxiv/`](literature-arxiv/README.md) | **arXiv 来源提供方** `@shlv/dsh-literature-arxiv`：Atom 搜索、精确 id 查找、BibTeX、全文产物下载 | 在 `ctx.literature` 注册来源 |
-| [`literature-tool/`](literature-tool/README.md) | **消费方** `@shlv/dsh-literature-tool`：三个面向模型的工具、schema、呈现、出版商 PDF 链接的子代理回退 | `ctx.tools` |
+| `@shlv/dsh-literature`（bundle） | **安装 bundle**：你只需 `dsh plugin add` 这一个包；它依赖四个功能包并携带挂载它们的 patch | profile bundle 层 |
+| `@shlv/dsh-literature-core` | **服务定义**（`ctx.literature`）：来源注册表、合并／去重／回退策略、记录解析、全文策略、共享 HTTP 传输、提取辅助、`LiteratureError` 分类 | `ctx.literature` |
+| `@shlv/dsh-literature-dblp` | **dblp 来源提供方**：搜索 API、记录 XML 查找、按记录 BibTeX、CoRR↔arXiv key 桥 | 在 `ctx.literature` 注册来源 |
+| `@shlv/dsh-literature-arxiv` | **arXiv 来源提供方**：Atom 搜索、精确 id 查找、BibTeX、全文产物下载 | 在 `ctx.literature` 注册来源 |
+| `@shlv/dsh-literature-tool` | **消费方**：三个面向模型的工具、schema、呈现、出版商 PDF 链接的子代理回退 | `ctx.tools` |
 
-两个来源共享一个 dblp 优先策略的 seam，因为它们独立演进：全文机制（tar、pdf.js）不能拖累 dblp 提供方，而且只加载一个提供方的部署仍能得到可用的搜索。
+你只需安装 bundle，其余四个是它的依赖。两个来源共享一个 dblp 优先策略的 seam，因为它们独立演进：全文机制（tar、pdf.js）不能拖累 dblp 提供方，而且只加载一个提供方的部署仍能得到可用的搜索。
 
 ## 快速开始
-
-把 bundle 装入任意 profile——一条命令带上整个系列：
 
 ```sh
 dsh plugin --profile headless add @shlv/dsh-literature
 dsh plugin --profile web add @shlv/dsh-literature
 ```
 
-bundle 依赖四个功能包（`-core`、`-dblp`、`-arxiv`、`-tool`），pnpm 会一起安装，bundle 的 patch 再插入全部四个插件行。从源码开发时，改用仓库自带 patch 挂载：
+一条命令装上整个系列。在带 `DEEPSEEK_API_KEY` 的源码 checkout 中，改用仓库自带 patch 挂载：
 
 ```sh
 cd deepseek-harness   # 一个 dsh checkout
@@ -54,7 +52,26 @@ pnpm dsh --profile headless --patch /path/to/dsh-literature/literature.patch.yml
   "搜索 'Attention is all you need'，获取其 BibTeX，再下载全文"
 ```
 
-`literature_fulltext` 的后台模式还需要 `@deepseek-ai/dsh-jobs-local` 与 `@deepseek-ai/dsh-tool-jobs`；出版商 PDF 回退需要带支持 `outputSchema` 的 provider 的 `subagents` 服务（默认 `spawn`）。
+## 环境要求
+
+- DeepSeek Harness `0.1.0-rc.6` 或兼容的后续版本（插件在该版本线声明 `@deepseek-ai/dsh-*` peer）。
+- Node.js `^22.19` 或 `>=24`。
+- `literature_fulltext` 的后台模式还需要 `@deepseek-ai/dsh-jobs-local` 与 `@deepseek-ai/dsh-tool-jobs`。
+- 出版商 PDF 回退需要带支持 `outputSchema` 的 provider 的 `subagents` 服务（默认 `spawn`）。缺少时，仅含 DOI 与落地页的输入报告 `LITERATURE_FULLTEXT_UNAVAILABLE`；搜索、BibTeX 与 arXiv 全文仍可用。
+
+## 安装与生命周期
+
+```sh
+dsh plugin --profile headless add @shlv/dsh-literature      # 安装
+dsh plugin --profile headless remove @shlv/dsh-literature   # 卸载
+```
+
+**升级。** 发布新版本后，`dsh plugin add` 可能仍装到旧版本，因为 pnpm 会缓存 registry 元数据。请用显式版本安装，或先清元数据缓存：
+
+```sh
+dsh plugin --profile headless add @shlv/dsh-literature@0.1.1
+# 或：pnpm cache clean
+```
 
 ## 工具
 
@@ -99,34 +116,20 @@ pnpm dsh --profile headless --patch /path/to/dsh-literature/literature.patch.yml
 
 工具保持模型上下文精简：`literature_search` 每篇论文一行并带截断页脚，`literature_bibtex` 一个围栏代码块加可选说明，`literature_fulltext` 返回有界摘要，提取的正文写入磁盘而非回显进提示词。seam 自身不贡献提示词或 schema；消费方拥有所有模型可见文案。
 
-## 开发
+## 故障排查
+
+- **安装后插件加载失败**（"Cannot find module … `lib/error.js`"）：安装的包缺少运行时模块。请重装最新版本（`dsh plugin --profile headless add @shlv/dsh-literature@<版本>`）；只打包 `lib/index.js` 的 tarball 是坏的。
+- **`dsh plugin add` 装到旧版本**：pnpm 的 registry 元数据缓存。用显式版本或 `pnpm cache clean`（见[安装与生命周期](#安装与生命周期)）。
+- **仅含 DOI 的论文报告 `LITERATURE_FULLTEXT_UNAVAILABLE`**：缺少 `subagents` 服务或配置的 provider，或发布商屏蔽非浏览器客户端（dl.acm.org 返回 403）。此时请传入显式 PDF URL。
+- **老论文的 arXiv 全文缺失**：HTML5 渲染仅对部分论文存在；seam 会回退到 PDF，而 PDF 需要发布商侧源码。
+
+## 开发与验证
 
 ```sh
-pnpm install          # 从 npm 安装宿主 dev 依赖；五个包作为 workspace 互链
-pnpm run build        # tsc，包序：core → 提供方 → tool（bundle 无 src）
-pnpm run typecheck    # 先 core，再对其余依赖包 --noEmit
-pnpm run test         # vitest —— 221 个测试，含真实 API 的性能探针
+pnpm install && pnpm run build && pnpm run typecheck && pnpm run test
 ```
 
-`vitest.config.ts` 将功能包别名到各自 `src`，测试无需先构建即可直接跑源码；`tsc` 通过各包构建出的 `lib/types` 解析包间类型。
-
-## 依赖策略
-
-本独立仓库沿用已发布插件的模式（参见 `dsh-vision-toolkit`）：
-
-- **宿主依赖作为 peer。** `@deepseek-ai/dsh-*`（`^0.1.0-rc.6`）、`@deepseek-ai/cordis`（`^4.0.1`）、`@deepseek-ai/schemastery`（`^3.18.1`）由加载插件的 Harness 运行时提供；各包不自装副本。
-- **bundle 是安装面。** `@shlv/dsh-literature` 把四个功能包声明为 `dependencies`，`dsh plugin add @shlv/dsh-literature` 一次装完整个系列。
-- **包间引用使用 `workspace:^`。** 功能包组成一个 pnpm workspace；`pnpm publish` 自动把 `workspace:` 说明改写为发布版本。
-- **dev 依赖钉住 registry 版本**，使 `pnpm install && pnpm run test` 可独立运行。
-- **源码解析保持本地。** 测试别名到 `src`；按包序构建（先 core）为每个依赖包提供 `lib/types`。
-
-## 发布
-
-五个包按依赖顺序发布：先 `@shlv/dsh-literature-core`（seam），再 `@shlv/dsh-literature-dblp` 与 `@shlv/dsh-literature-arxiv`，然后 `@shlv/dsh-literature-tool`，最后发布 `@shlv/dsh-literature` bundle——每次 `pnpm publish` 都会运行 `prepack` 构建，并把包间 `workspace:^` 说明改写为发布版本。本仓库的 `deepseek-harness/packages/literature` 快照与主 checkout 需要手动保持同步。
-
-**发布前**，在每个包内运行 `npm pack --dry-run`，确认 tarball 携带完整的 `lib/` 树。tsc 构建是每个源码模块一个 js（`lib/error.js`、`lib/merge.js`、…），因此 `files` 必须是 `["lib"]`——主仓库基于 tsdown 的单文件白名单会发布一个运行时无法加载的 tarball（`0.1.0` 正是因此损坏）。
-
-**发布新版本后**，`dsh plugin add` 可能仍装到旧版本，因为 pnpm 会缓存 registry 元数据。请用显式版本安装（`dsh plugin add @shlv/dsh-literature@0.1.1`），或先清元数据缓存（`pnpm cache clean`）。
+仓库布局、依赖策略、发布流程与完整验证清单见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
 ## 已知限制
 
