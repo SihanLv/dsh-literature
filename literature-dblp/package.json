@@ -32,7 +32,7 @@
   "license": "MIT",
   "peerDependencies": {
     "@deepseek-ai/dsh-invariants": "^0.1.0-rc.6",
-    "@shlv/dsh-literature": "workspace:^",
+    "@shlv/dsh-literature-core": "workspace:^",
     "@deepseek-ai/cordis": "^4.0.1"
   },
   "dependencies": {
@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "@deepseek-ai/dsh-invariants": "0.1.0-rc.6",
-    "@shlv/dsh-literature": "workspace:^",
+    "@shlv/dsh-literature-core": "workspace:^",
     "@deepseek-ai/cordis": "4.0.1"
   },
   "scripts": {

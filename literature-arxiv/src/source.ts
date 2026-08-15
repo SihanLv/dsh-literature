@@ -5,8 +5,8 @@
  */
 
 import { XMLParser } from 'fast-xml-parser'
-import type { BibtexResult, LiteratureRef, LiteratureSource, RawHit } from '@shlv/dsh-literature'
-import { compact, encodePathSegments, httpGet, LiteratureError, normalizeTitle, parseDoi, type HttpLimits } from '@shlv/dsh-literature'
+import type { BibtexResult, LiteratureRef, LiteratureSource, RawHit } from '@shlv/dsh-literature-core'
+import { compact, encodePathSegments, httpGet, LiteratureError, normalizeTitle, parseDoi, type HttpLimits } from '@shlv/dsh-literature-core'
 
 /** One Atom feed entry, flattened from the arXiv query response. */
 interface AtomEntry {

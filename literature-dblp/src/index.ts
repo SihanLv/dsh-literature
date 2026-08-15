@@ -8,8 +8,8 @@
 
 import type { Context } from '@deepseek-ai/cordis'
 import z from '@deepseek-ai/schemastery'
-import { createThrottle } from '@shlv/dsh-literature'
-import type {} from '@shlv/dsh-literature'
+import { createThrottle } from '@shlv/dsh-literature-core'
+import type {} from '@shlv/dsh-literature-core'
 import { DblpSource, type DblpLimits } from './source.ts'
 
 export { DblpSource } from './source.ts'

@@ -9,7 +9,7 @@ import {
   parseArxivId,
   parseDoi,
   stableRecordId,
-} from '@shlv/dsh-literature'
+} from '@shlv/dsh-literature-core'
 
 describe('normalizeTitle', () => {
   it('lowercases, collapses whitespace, and drops punctuation', () => {

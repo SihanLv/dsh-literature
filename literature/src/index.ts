@@ -4,7 +4,7 @@
  * resolution, and BibTeX selection. The dblp source is preferred for formal
  * (published) records and for CoRR-mirrored BibTeX; arXiv is the fallback for
  * preprints dblp has not synced yet.
- * @module @shlv/dsh-literature
+ * @module @shlv/dsh-literature-core
  */
 
 import { Context, Service } from '@deepseek-ai/cordis'

@@ -1,7 +1,7 @@
 /**
  * Shared vocabulary for the literature capability seam: source identifiers,
  * normalized records, requests/results, and the provider interface.
- * @module @shlv/dsh-literature/types
+ * @module @shlv/dsh-literature-core/types
  */
 
 /** Stable source identifiers registered on the literature seam. */

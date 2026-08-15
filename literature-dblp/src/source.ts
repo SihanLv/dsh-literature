@@ -4,9 +4,9 @@
  * @module @shlv/dsh-literature-dblp/source
  */
 
-import type { LiteratureRef, LiteratureSource, RawHit } from '@shlv/dsh-literature'
-import type { BibtexResult } from '@shlv/dsh-literature'
-import { corrKeyToArxivId, compact, encodePathSegments, httpGet, LiteratureError, normalizeTitle, parseDoi, type HttpLimits } from '@shlv/dsh-literature'
+import type { LiteratureRef, LiteratureSource, RawHit } from '@shlv/dsh-literature-core'
+import type { BibtexResult } from '@shlv/dsh-literature-core'
+import { corrKeyToArxivId, compact, encodePathSegments, httpGet, LiteratureError, normalizeTitle, parseDoi, type HttpLimits } from '@shlv/dsh-literature-core'
 
 /** Whether a status code means dblp throttled or is transiently unavailable. */
 function isRateLimited(status: number): boolean {

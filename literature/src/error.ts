@@ -1,7 +1,7 @@
 /**
  * The closed {@link LiteratureError} taxonomy: every literature failure maps to
  * one structured code a direct caller (the model-facing tool) routes on.
- * @module @shlv/dsh-literature/error
+ * @module @shlv/dsh-literature-core/error
  */
 
 /** Closed union of literature failure codes. */

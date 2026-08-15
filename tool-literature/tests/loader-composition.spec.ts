@@ -13,8 +13,8 @@ import Loader from '@deepseek-ai/cordis-plugin-loader'
 import Include from '@deepseek-ai/cordis-plugin-include'
 import ToolRuntime from '@deepseek-ai/dsh-tools'
 import SystemPrompt from '@deepseek-ai/dsh-system-prompt'
-import { LiteratureRuntime } from '@shlv/dsh-literature'
-import * as tool from '@shlv/dsh-tool-literature'
+import { LiteratureRuntime } from '@shlv/dsh-literature-core'
+import * as tool from '@shlv/dsh-literature-tool'
 
 /** A stub source registering one dblp hit, booted through the Loader like a real provider. */
 const stubSource = {
@@ -59,10 +59,10 @@ describe('tool-literature real Loader composition', () => {
     await writeFile(configPath, [
       "- name: '@deepseek-ai/dsh-system-prompt'",
       "- name: '@deepseek-ai/dsh-tools'",
-      "- name: '@shlv/dsh-literature'",
+      "- name: '@shlv/dsh-literature-core'",
       "- name: '@test/stub-source'",
       "- name: '@test/stub-fs'",
-      "- name: '@shlv/dsh-tool-literature'",
+      "- name: '@shlv/dsh-literature-tool'",
       '',
     ].join('\n'))
 
@@ -73,10 +73,10 @@ describe('tool-literature real Loader composition', () => {
     const modules = new Map<string, unknown>([
       ['@deepseek-ai/dsh-system-prompt', SystemPrompt],
       ['@deepseek-ai/dsh-tools', ToolRuntime],
-      ['@shlv/dsh-literature', LiteratureRuntime],
+      ['@shlv/dsh-literature-core', LiteratureRuntime],
       ['@test/stub-source', stubSource],
       ['@test/stub-fs', stubFs],
-      ['@shlv/dsh-tool-literature', tool],
+      ['@shlv/dsh-literature-tool', tool],
     ])
     context.loader.internal = {
       version: 'v2',

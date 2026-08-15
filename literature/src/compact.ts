@@ -1,7 +1,7 @@
 /**
  * Drop `undefined`-valued keys from an object literal so it satisfies the
  * repository's `exactOptionalPropertyTypes` when optional fields are absent.
- * @module @shlv/dsh-literature/compact
+ * @module @shlv/dsh-literature-core/compact
  */
 
 /** `T` with every property's `undefined` removed from its type. */

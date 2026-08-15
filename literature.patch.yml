@@ -1,9 +1,11 @@
-# Mount the literature capability family on top of a dsh profile.
+# Mount the literature capability family on top of a dsh profile (source
+# development; the published @shlv/dsh-literature bundle ships the same rows
+# as bundle/cordis.patch.yml).
 #
-# Usage (from the repo root, with DEEPSEEK_API_KEY in the environment or
+# Usage (from this repo root, with DEEPSEEK_API_KEY in the environment or
 # root .env):
 #
-#   pnpm dsh --profile headless --patch packages/literature/literature.patch.yml \
+#   pnpm dsh --profile headless --patch literature.patch.yml \
 #     "用 literature_search 搜索 Attention is all you need，然后获取全文"
 #
 # The base bundle already carries the subagents service with the spawn/fork
@@ -12,7 +14,7 @@
 # adapter; this layer only inserts the four literature packages.
 - insert:
     - id: literature
-      name: '@shlv/dsh-literature'
+      name: '@shlv/dsh-literature-core'
 
     - id: literature-dblp
       name: '@shlv/dsh-literature-dblp'
@@ -21,4 +23,4 @@
       name: '@shlv/dsh-literature-arxiv'
 
     - id: tool-literature
-      name: '@shlv/dsh-tool-literature'
+      name: '@shlv/dsh-literature-tool'

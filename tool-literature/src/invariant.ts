@@ -1,13 +1,13 @@
 /**
- * Package-owned invariant companion for `@shlv/dsh-tool-literature`.
- * @module @shlv/dsh-tool-literature/invariant
+ * Package-owned invariant companion for `@shlv/dsh-literature-tool`.
+ * @module @shlv/dsh-literature-tool/invariant
  */
 
 /* jscpd:ignore-start */
 import type { Context } from '@deepseek-ai/cordis'
 import type { InvariantInstaller } from '@deepseek-ai/dsh-invariants'
 
-const PACKAGE_NAME = '@shlv/dsh-tool-literature'
+const PACKAGE_NAME = '@shlv/dsh-literature-tool'
 
 /** Cordis companion plugin name. */
 export const name = 'tool-literature-invariant'

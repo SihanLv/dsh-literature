@@ -1,0 +1,29 @@
+{
+  "name": "@shlv/dsh-literature",
+  "version": "0.1.0",
+  "description": "Install bundle for the @shlv/dsh-literature family: one `dsh plugin add` installs the seam (ctx.literature), the dblp and arXiv providers, and the model-facing tools.",
+  "type": "module",
+  "files": [
+    "cordis.patch.yml",
+    "README.md"
+  ],
+  "dependencies": {
+    "@shlv/dsh-literature-core": "workspace:^",
+    "@shlv/dsh-literature-dblp": "workspace:^",
+    "@shlv/dsh-literature-arxiv": "workspace:^",
+    "@shlv/dsh-literature-tool": "workspace:^"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SihanLv/dsh-literature.git"
+  },
+  "license": "MIT"
+}

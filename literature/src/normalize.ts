@@ -2,7 +2,7 @@
  * Pure, source-independent normalization and identifier recognition for the
  * literature seam: title canonicalization, arXiv/dblp/DOI/URL recognition, and
  * the dblp CoRR↔arXiv key bridge.
- * @module @shlv/dsh-literature/normalize
+ * @module @shlv/dsh-literature-core/normalize
  */
 
 /** arXiv identifier as the model or a source reports it (no `arXiv:` prefix). */

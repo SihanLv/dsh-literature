@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { compact, mergeHits } from '@shlv/dsh-literature'
-import type { RawHit } from '@shlv/dsh-literature'
+import { compact, mergeHits } from '@shlv/dsh-literature-core'
+import type { RawHit } from '@shlv/dsh-literature-core'
 
 describe('compact', () => {
   it('deletes undefined-valued keys in place', () => {

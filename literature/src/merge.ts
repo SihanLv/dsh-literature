@@ -3,7 +3,7 @@
  * the same paper (CoRR bridge, then publisher DOI, then normalized title),
  * prefer the formal dblp record's metadata, and retain the arXiv id for full
  * text.
- * @module @shlv/dsh-literature/merge
+ * @module @shlv/dsh-literature-core/merge
  */
 
 import type { LiteratureRecord, RawHit } from './types.ts'

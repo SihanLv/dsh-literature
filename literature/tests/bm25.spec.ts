@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { bm25TitleScores, normalizeTitle } from '@shlv/dsh-literature'
+import { bm25TitleScores, normalizeTitle } from '@shlv/dsh-literature-core'
 
 describe('bm25TitleScores', () => {
   it('ranks the exact-title candidate highest over partial-overlap noise', () => {

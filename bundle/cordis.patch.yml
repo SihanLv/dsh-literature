@@ -1,0 +1,15 @@
+# @shlv/dsh-literature bundle: mounts the whole literature family into a
+# profile layer stack. Installing this bundle with `dsh plugin add` pulls the
+# four functional packages and inserts their plugin rows.
+- insert:
+    - id: literature
+      name: '@shlv/dsh-literature-core'
+
+    - id: literature-dblp
+      name: '@shlv/dsh-literature-dblp'
+
+    - id: literature-arxiv
+      name: '@shlv/dsh-literature-arxiv'
+
+    - id: tool-literature
+      name: '@shlv/dsh-literature-tool'

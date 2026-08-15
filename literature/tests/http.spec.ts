@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { httpGet, type HttpLimits } from '@shlv/dsh-literature'
-import { LiteratureError } from '@shlv/dsh-literature'
+import { httpGet, type HttpLimits } from '@shlv/dsh-literature-core'
+import { LiteratureError } from '@shlv/dsh-literature-core'
 
 const LIMITS: HttpLimits = {
   maxUrlLength: 100,

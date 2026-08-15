@@ -2,7 +2,7 @@
  * The shared, SSRF-guarded HTTP(S) transport for the literature seam. Supports
  * binary bodies (the arXiv source tarball and PDF) and text, enforces url
  * hygiene, same-origin redirect and byte caps, and a cooperative deadline.
- * @module @shlv/dsh-literature/http
+ * @module @shlv/dsh-literature-core/http
  */
 
 import { deadline } from '@deepseek-ai/dsh-timeout'

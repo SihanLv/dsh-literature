@@ -1,9 +1,9 @@
 /**
- * `@shlv/dsh-tool-literature`: model-facing literature tools over
+ * `@shlv/dsh-literature-tool`: model-facing literature tools over
  * `ctx.literature`. Owns the tool names, schemas, validation, presentation,
  * and the publisher-PDF-link subagent fallback; the literature seam owns
  * retrieval, merging, and extraction.
- * @module @shlv/dsh-tool-literature
+ * @module @shlv/dsh-literature-tool
  */
 
 import type { Context } from '@deepseek-ai/cordis'
@@ -20,7 +20,7 @@ import {
   isHttpUrl,
   type FulltextResult,
   type LiteratureRecord,
-} from '@shlv/dsh-literature'
+} from '@shlv/dsh-literature-core'
 
 export const name = 'tool-literature'
 export const inject = ['tools', 'literature', 'fs']

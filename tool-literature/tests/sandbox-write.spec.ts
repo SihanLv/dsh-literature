@@ -18,8 +18,8 @@ import SandboxPolicy from '@deepseek-ai/dsh-sandbox-policy'
 import SandboxedFileSystem from '@deepseek-ai/dsh-fs-sandbox'
 import { Session, SessionId } from '@deepseek-ai/dsh-session'
 import type { Agent } from '@deepseek-ai/dsh-agent'
-import type { LiteratureSearchResult, FulltextResult } from '@shlv/dsh-literature'
-import * as tool from '@shlv/dsh-tool-literature'
+import type { LiteratureSearchResult, FulltextResult } from '@shlv/dsh-literature-core'
+import * as tool from '@shlv/dsh-literature-tool'
 
 const signal = new AbortController().signal
 

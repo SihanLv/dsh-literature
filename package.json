@@ -2,7 +2,7 @@
   "name": "dsh-literature-standalone",
   "version": "0.0.0",
   "private": true,
-  "description": "Standalone repository for the @shlv/dsh-literature family: the literature research capability seam (dblp + arXiv) plus its model-facing tools. Host dependencies (@deepseek-ai/dsh-*, cordis, schemastery) resolve through npm; the four literature packages link as a local workspace.",
+  "description": "Standalone repository for the @shlv/dsh-literature-core family: the literature research capability seam (dblp + arXiv) plus its model-facing tools. Host dependencies (@deepseek-ai/dsh-*, cordis, schemastery) resolve through npm; the four literature packages link as a local workspace.",
   "type": "module",
   "scripts": {
     "build": "tsc -p literature/tsconfig.json && tsc -p literature-dblp/tsconfig.json && tsc -p literature-arxiv/tsconfig.json && tsc -p tool-literature/tsconfig.json",

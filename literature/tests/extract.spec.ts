@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { gzipSync } from 'node:zlib'
-import { extractPdfText, extractSource, htmlToMarkdown, isSafeArchivePath, minifyLandingPageHtml, pdfItemText, stripTex, untarSource } from '@shlv/dsh-literature'
-import { LiteratureError } from '@shlv/dsh-literature'
+import { extractPdfText, extractSource, htmlToMarkdown, isSafeArchivePath, minifyLandingPageHtml, pdfItemText, stripTex, untarSource } from '@shlv/dsh-literature-core'
+import { LiteratureError } from '@shlv/dsh-literature-core'
 
 /** A gzipped tarball holding `src/main.tex` and `src/refs.bib`. */
 const TARBALL_B64 = 'H4sIAAAAAAAAA+2TTUvEMBBAc+6vmLvSnfQjPQl60/see2nT0S2bJpJksVL636VgIbCKwlIUzbvMkMBkMsNzVu7YxiBiVZXAEHlVYhhXgPEyy6tCFJhzhjwTPAdWbt3Ywsn5xjJE5Q4X1Vk/ssZfQDjTMA9xVu6Gptepp3GrPhBRiOLT/XNxtv8iKwUw3KqhkH++/7oz8jSQ9lI1zk2N9b1UNCd1S0+9ntbbOQEc8fkKQZphOUjuSSkDL8aqLoXakfS90dOD9tbMsKfRw4EspUlNugvK/NgwIh+y+G/p0aVt3271xhf+Y16d+59j9P9SvuP/7bvx05Fer8H3XtHNdAf7JZmjrpFIJPJneQMsZmBUAA4AAA=='

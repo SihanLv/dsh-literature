@@ -7,8 +7,8 @@
 
 import type { Context } from '@deepseek-ai/cordis'
 import z from '@deepseek-ai/schemastery'
-import { createThrottle } from '@shlv/dsh-literature'
-import type {} from '@shlv/dsh-literature'
+import { createThrottle } from '@shlv/dsh-literature-core'
+import type {} from '@shlv/dsh-literature-core'
 import { ArxivSource, type ArxivLimits } from './source.ts'
 
 export { ArxivSource } from './source.ts'

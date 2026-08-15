@@ -1,6 +1,6 @@
 import { it } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
-import { LiteratureRuntime } from '@shlv/dsh-literature'
+import { LiteratureRuntime } from '@shlv/dsh-literature-core'
 import { DblpSource } from '@shlv/dsh-literature-dblp'
 import { ArxivSource } from '@shlv/dsh-literature-arxiv'
 

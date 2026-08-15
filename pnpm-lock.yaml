@@ -18,6 +18,21 @@ importers:
         specifier: ^4.1.8
         version: 4.1.10(@types/node@22.20.1)(vite@8.2.1(@types/node@22.20.1))
 
+  bundle:
+    dependencies:
+      '@shlv/dsh-literature-arxiv':
+        specifier: workspace:^
+        version: link:../literature-arxiv
+      '@shlv/dsh-literature-core':
+        specifier: workspace:^
+        version: link:../literature
+      '@shlv/dsh-literature-dblp':
+        specifier: workspace:^
+        version: link:../literature-dblp
+      '@shlv/dsh-literature-tool':
+        specifier: workspace:^
+        version: link:../tool-literature
+
   literature:
     dependencies:
       '@deepseek-ai/schemastery':
@@ -67,7 +82,7 @@ importers:
       '@deepseek-ai/dsh-invariants':
         specifier: 0.1.0-rc.6
         version: 0.1.0-rc.6(@deepseek-ai/cordis@4.0.1)
-      '@shlv/dsh-literature':
+      '@shlv/dsh-literature-core':
         specifier: workspace:^
         version: link:../literature
 
@@ -83,7 +98,7 @@ importers:
       '@deepseek-ai/dsh-invariants':
         specifier: 0.1.0-rc.6
         version: 0.1.0-rc.6(@deepseek-ai/cordis@4.0.1)
-      '@shlv/dsh-literature':
+      '@shlv/dsh-literature-core':
         specifier: workspace:^
         version: link:../literature
 
@@ -138,7 +153,7 @@ importers:
       '@deepseek-ai/dsh-tools':
         specifier: 0.1.0-rc.6
         version: 0.1.0-rc.6(f8724372086ccc1457fc84e7becee2e0)
-      '@shlv/dsh-literature':
+      '@shlv/dsh-literature-core':
         specifier: workspace:^
         version: link:../literature
 

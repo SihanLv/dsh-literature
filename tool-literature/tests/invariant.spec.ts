@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import * as invariant from '@shlv/dsh-tool-literature/invariant'
+import * as invariant from '@shlv/dsh-literature-tool/invariant'
 
 describe('tool-literature invariant companion', () => {
   it('registers the package-owned no-op installer', async () => {
@@ -8,7 +8,7 @@ describe('tool-literature invariant companion', () => {
     const dispose = await invariant.apply(ctx)
     expect(invariant.name).toBe('tool-literature-invariant')
     expect(invariant.inject).toEqual(['invariants'])
-    expect(register).toHaveBeenCalledWith('@shlv/dsh-tool-literature', expect.any(Function))
+    expect(register).toHaveBeenCalledWith('@shlv/dsh-literature-tool', expect.any(Function))
     expect(() => {
       const install = register.mock.calls[0]![1] as () => void
       install()

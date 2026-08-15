@@ -1,4 +1,5 @@
 packages:
+- bundle
 - literature
 - literature-dblp
 - literature-arxiv

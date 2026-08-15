@@ -3,7 +3,7 @@
  * rerank merged search candidates by how well each title matches a title
  * query, because the sources order their results by their own criteria (dblp
  * by year, arXiv by relevance) rather than by title similarity.
- * @module @shlv/dsh-literature/bm25
+ * @module @shlv/dsh-literature-core/bm25
  */
 
 /** BM25 term-frequency saturation. */

@@ -1,4 +1,4 @@
-# @shlv/dsh-literature
+# @shlv/dsh-literature-core
 
 English | [中文](README.zh.md)
 

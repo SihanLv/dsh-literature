@@ -2,7 +2,7 @@
  * Full-text extraction for the literature seam: in-memory gunzip+untar of the
  * arXiv source tarball, PDF text extraction via pdfjs-dist, HTML→Markdown via
  * turndown, and a lossy LaTeX→prose stripper for the readable summary.
- * @module @shlv/dsh-literature/extract
+ * @module @shlv/dsh-literature-core/extract
  */
 
 import { gunzipSync } from 'node:zlib'

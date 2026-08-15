@@ -6,7 +6,7 @@ import SystemPrompt from '@deepseek-ai/dsh-system-prompt'
 import { Session, SessionId, SESSION_FORMAT_VERSION } from '@deepseek-ai/dsh-session'
 import type { Agent } from '@deepseek-ai/dsh-agent'
 import { JobId, type JobStart } from '@deepseek-ai/dsh-jobs'
-import { LiteratureError, type BibtexResult, type FulltextResult, type LiteratureRecord, type LiteratureSearchResult } from '@shlv/dsh-literature'
+import { LiteratureError, type BibtexResult, type FulltextResult, type LiteratureRecord, type LiteratureSearchResult } from '@shlv/dsh-literature-core'
 import * as tool from '../src/index.ts'
 
 const signal = new AbortController().signal
