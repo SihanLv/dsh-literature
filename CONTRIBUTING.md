@@ -40,7 +40,7 @@ The standalone repository follows the published-plugin pattern (see `dsh-vision-
 
 Five packages publish in dependency order — `@shlv/dsh-literature-core` (the seam) first, then `@shlv/dsh-literature-dblp` and `@shlv/dsh-literature-arxiv`, then `@shlv/dsh-literature-tool`, and finally the `@shlv/dsh-literature` bundle. All five share one version number, so bump them together (e.g. `pnpm -r version patch`, or edit the five `version` fields by hand).
 
-**Automated (recommended).** `.github/workflows/release.yml` publishes for you. Prerequisite: an npm automation token with publish access to the `@shlv` scope, stored as the `NPM_TOKEN` repository secret (GitHub → Settings → Secrets and variables → Actions). Then:
+**Automated (recommended).** `.github/workflows/release.yml` publishes for you using npm **Trusted Publishing** (OIDC) — no token secret is stored. One-time npm-side setup: publish the five packages once from your local machine (`npm login`, then the manual flow below — already done for the first release), then on npmjs.com configure a Trusted Publisher for each package (or for the `@shlv` organization): Package/Organization Settings → Trusted Publishing → add a GitHub Actions publisher with repository `SihanLv/dsh-literature` and workflow filename `release.yml`. Then each release is:
 
 ```sh
 pnpm -r version patch                # bump all five packages together

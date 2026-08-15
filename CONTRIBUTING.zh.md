@@ -40,7 +40,7 @@ pnpm run test         # vitest —— 221 个测试，含真实 API 的性能探
 
 五个包按依赖顺序发布——先 `@shlv/dsh-literature-core`（seam），再 `@shlv/dsh-literature-dblp` 与 `@shlv/dsh-literature-arxiv`，然后 `@shlv/dsh-literature-tool`，最后发布 `@shlv/dsh-literature` bundle。五个包共享同一个版本号，需一起 bump（例如 `pnpm -r version patch`，或手工改五个 `version` 字段）。
 
-**自动发布（推荐）。** `.github/workflows/release.yml` 会替你完成发布。前置：一个对 `@shlv` scope 有发布权限的 npm automation token，存为仓库 `NPM_TOKEN` secret（GitHub → Settings → Secrets and variables → Actions）。然后：
+**自动发布（推荐）。** `.github/workflows/release.yml` 使用 npm **Trusted Publishing**（OIDC）替你完成发布——无需保存任何 token secret。npm 侧一次性配置：先从本地发布一次五个包（`npm login`，然后按下方手动流程——首次发布已完成），再在 npmjs.com 为每个包（或 `@shlv` 组织）配置 Trusted Publisher：包／组织设置 → Trusted Publishing → 添加 GitHub Actions publisher，仓库填 `SihanLv/dsh-literature`，workflow 文件名填 `release.yml`。之后每次发布：
 
 ```sh
 pnpm -r version patch                # 五个包一起 bump 版本

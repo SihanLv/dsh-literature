@@ -4,10 +4,9 @@ name: Release
 # Release. Triggered by a `v*` tag push (e.g. `git tag v0.1.2 && git push
 # origin v0.1.2`) or manually via the Actions tab.
 #
-# Prerequisite: an npm automation token with publish access to the @shlv
-# scope, stored as the NPM_TOKEN repository secret (GitHub → Settings →
-# Secrets and variables → Actions). The tag version must equal the version
-# in the five package.json files.
+# npm authentication uses Trusted Publishing (OIDC) — no token secret is
+# needed; npm validates the GitHub Actions workflow identity directly. The
+# tag version must equal the version in the five package.json files.
 on:
   push:
     tags:
@@ -16,6 +15,7 @@ on:
 
 permissions:
   contents: write # create the GitHub Release
+  id-token: write # npm Trusted Publishing (OIDC)
 
 jobs:
   release:
@@ -80,14 +80,11 @@ jobs:
           done
 
       - name: Publish packages in dependency order
-        run: |
-          cd literature-core && pnpm publish --no-git-checks
-          cd ../literature-dblp && pnpm publish --no-git-checks
-          cd ../literature-arxiv && pnpm publish --no-git-checks
-          cd ../literature-tool && pnpm publish --no-git-checks
-          cd ../literature && pnpm publish --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: pnpm -r publish --no-git-checks
+        # pnpm -r walks the workspace in dependency order (core → dblp →
+        # arxiv → tool → bundle). npm's OIDC trusted publishing auto-detects
+        # the GitHub Actions environment from the id-token permission and
+        # generates provenance; no registry token is supplied.
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
