@@ -2,7 +2,9 @@
 
 [English](README.md) | 中文
 
-**源码：** [github.com/SihanLv/dsh-literature](https://github.com/SihanLv/dsh-literature)
+<p align="center">
+  <img src="dsh-literature.png" alt="dsh-literature —— 一次查询，同时覆盖 dblp 与 arXiv" width="720">
+</p>
 
 **一次查询，同时覆盖 dblp 与 arXiv。** 面向 DeepSeek Harness 的文献调研能力：同时检索两个数据库，每篇论文只返回一条合并记录，取到最权威的 BibTeX，以及可获取的全文——模型无需自己在两库之间来回切换。
 
