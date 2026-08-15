@@ -1,10 +1,10 @@
-# dsh-literature — Literature Research for DeepSeek Harness
-
-English | [中文](README.zh.md)
-
 <p align="center">
   <img src="dsh-literature.png" alt="dsh-literature — one query across dblp and arXiv" width="720">
 </p>
+
+# dsh-literature — Literature Research for DeepSeek Harness
+
+English | [中文](README.zh.md)
 
 **One query across dblp and arXiv.** The literature research capability for DeepSeek Harness: search both sources, get one merged record per paper, the most authoritative BibTeX available, and full text when it exists — without the model ever juggling two databases itself.
 
