@@ -38,9 +38,20 @@ The standalone repository follows the published-plugin pattern (see `dsh-vision-
 
 ## Publishing
 
-Five packages publish in dependency order — `@shlv/dsh-literature-core` (the seam) first, then `@shlv/dsh-literature-dblp` and `@shlv/dsh-literature-arxiv`, then `@shlv/dsh-literature-tool`, and finally the `@shlv/dsh-literature` bundle.
+Five packages publish in dependency order — `@shlv/dsh-literature-core` (the seam) first, then `@shlv/dsh-literature-dblp` and `@shlv/dsh-literature-arxiv`, then `@shlv/dsh-literature-tool`, and finally the `@shlv/dsh-literature` bundle. All five share one version number, so bump them together (e.g. `pnpm -r version patch`, or edit the five `version` fields by hand).
 
-Before the first release: `npm login` (you must own the `@shlv` scope), and pick a version for the whole family — all five packages share one version number, so bump them together (e.g. `pnpm -r version patch`, or edit the five `version` fields by hand). From the repository root:
+**Automated (recommended).** `.github/workflows/release.yml` publishes for you. Prerequisite: an npm automation token with publish access to the `@shlv` scope, stored as the `NPM_TOKEN` repository secret (GitHub → Settings → Secrets and variables → Actions). Then:
+
+```sh
+pnpm -r version patch                # bump all five packages together
+git add -A && git commit -m "release: v0.1.2"
+git push
+git tag v0.1.2 && git push origin v0.1.2   # triggers the workflow
+```
+
+The workflow checks out, installs, runs typecheck/test/build, verifies the five versions match the tag, verifies each tarball carries its runtime modules, publishes the five packages in dependency order, and creates a GitHub Release with auto-generated notes. On `workflow_dispatch` the tag check is skipped.
+
+**Manual.** You can also publish from a local checkout (run `npm login` first — you must own the `@shlv` scope):
 
 ```sh
 cd literature-core && pnpm publish && cd ..    # ① seam

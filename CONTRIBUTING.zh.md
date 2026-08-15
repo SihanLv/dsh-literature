@@ -38,9 +38,20 @@ pnpm run test         # vitest —— 221 个测试，含真实 API 的性能探
 
 ## 发布
 
-五个包按依赖顺序发布——先 `@shlv/dsh-literature-core`（seam），再 `@shlv/dsh-literature-dblp` 与 `@shlv/dsh-literature-arxiv`，然后 `@shlv/dsh-literature-tool`，最后发布 `@shlv/dsh-literature` bundle。
+五个包按依赖顺序发布——先 `@shlv/dsh-literature-core`（seam），再 `@shlv/dsh-literature-dblp` 与 `@shlv/dsh-literature-arxiv`，然后 `@shlv/dsh-literature-tool`，最后发布 `@shlv/dsh-literature` bundle。五个包共享同一个版本号，需一起 bump（例如 `pnpm -r version patch`，或手工改五个 `version` 字段）。
 
-首次发布前：`npm login`（你必须拥有 `@shlv` scope），并为整个系列选定版本——五个包共享同一个版本号，需一起 bump（例如 `pnpm -r version patch`，或手工改五个 `version` 字段）。在仓库根目录执行：
+**自动发布（推荐）。** `.github/workflows/release.yml` 会替你完成发布。前置：一个对 `@shlv` scope 有发布权限的 npm automation token，存为仓库 `NPM_TOKEN` secret（GitHub → Settings → Secrets and variables → Actions）。然后：
+
+```sh
+pnpm -r version patch                # 五个包一起 bump 版本
+git add -A && git commit -m "release: v0.1.2"
+git push
+git tag v0.1.2 && git push origin v0.1.2   # 触发 workflow
+```
+
+workflow 会：checkout、安装依赖、跑 typecheck／test／build，校验五个版本与 tag 一致、校验每个 tarball 携带运行时模块，然后按依赖顺序发布五个包，并用自动生成的说明创建 GitHub Release。`workflow_dispatch` 手动触发时跳过 tag 校验。
+
+**手动发布。** 也可以从本地 checkout 发布（先 `npm login`——你必须拥有 `@shlv` scope）：
 
 ```sh
 cd literature-core && pnpm publish && cd ..    # ① seam

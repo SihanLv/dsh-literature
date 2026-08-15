@@ -1,0 +1,95 @@
+name: Release
+
+# Publish the five @shlv/dsh-literature packages to npm and create a GitHub
+# Release. Triggered by a `v*` tag push (e.g. `git tag v0.1.2 && git push
+# origin v0.1.2`) or manually via the Actions tab.
+#
+# Prerequisite: an npm automation token with publish access to the @shlv
+# scope, stored as the NPM_TOKEN repository secret (GitHub → Settings →
+# Secrets and variables → Actions). The tag version must equal the version
+# in the five package.json files.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write # create the GitHub Release
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.7.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck and test
+        run: |
+          pnpm run typecheck
+          pnpm run test
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Verify version consistency and tag
+        run: |
+          VERSION=$(node -p "require('./literature-core/package.json').version")
+          for dir in literature-dblp literature-arxiv literature-tool literature; do
+            OTHER=$(node -p "require('./$dir/package.json').version")
+            if [ "$OTHER" != "$VERSION" ]; then
+              echo "ERROR: $dir is at $OTHER, expected $VERSION" >&2
+              exit 1
+            fi
+          done
+          if [[ "${GITHUB_REF_NAME:-}" == v* ]]; then
+            if [ "${GITHUB_REF_NAME#v}" != "$VERSION" ]; then
+              echo "ERROR: tag ${GITHUB_REF_NAME} does not match version $VERSION" >&2
+              exit 1
+            fi
+          fi
+          echo "all five packages at $VERSION"
+
+      - name: Verify tarballs carry the runtime modules
+        run: |
+          # Regression guard for the 0.1.0 incident: the tsc build emits one
+          # js per source module and `files` must be ["lib"], so each tarball
+          # must contain more than just lib/index.js.
+          for dir in literature-core literature-dblp literature-arxiv literature-tool; do
+            count=$(cd "$dir" && npm pack --dry-run 2>/dev/null | grep -c 'lib/.*\.js')
+            echo "$dir: $count runtime js files in tarball"
+            if [ "$count" -lt 3 ]; then
+              echo "ERROR: $dir tarball is missing runtime modules (files whitelist regression?)" >&2
+              exit 1
+            fi
+          done
+
+      - name: Publish packages in dependency order
+        run: |
+          cd literature-core && pnpm publish --no-git-checks
+          cd ../literature-dblp && pnpm publish --no-git-checks
+          cd ../literature-arxiv && pnpm publish --no-git-checks
+          cd ../literature-tool && pnpm publish --no-git-checks
+          cd ../literature && pnpm publish --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
