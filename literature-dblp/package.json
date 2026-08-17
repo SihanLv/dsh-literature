@@ -1,7 +1,7 @@
 {
   "name": "@shlv/dsh-literature-dblp",
-  "description": "DBLP source provider for the literature seam: search, per-record BibTeX, metadata, and the CoRR↔arXiv key bridge",
-  "version": "0.1.1",
+  "description": "DBLP source provider for the literature seam: search, per-record BibTeX, metadata, and the CoRR\u2194arXiv key bridge",
+  "version": "0.1.2",
   "publishConfig": {
     "access": "public"
   },

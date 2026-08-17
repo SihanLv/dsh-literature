@@ -1,7 +1,7 @@
 {
   "name": "@shlv/dsh-literature-core",
-  "description": "Literature research capability seam (ctx.literature) for the DeepSeek Harness — dblp/arXiv source registry, merge/dedupe/fallback policy, record resolution, full-text strategy, and the LiteratureError taxonomy",
-  "version": "0.1.1",
+  "description": "Literature research capability seam (ctx.literature) for the DeepSeek Harness \u2014 dblp/arXiv source registry, merge/dedupe/fallback policy, record resolution, full-text strategy, and the LiteratureError taxonomy",
+  "version": "0.1.2",
   "publishConfig": {
     "access": "public"
   },

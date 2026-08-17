@@ -1,7 +1,7 @@
 {
   "name": "@shlv/dsh-literature-arxiv",
   "description": "arXiv source provider for the literature seam: search, per-record BibTeX, and full-text download (source tarball, HTML, PDF)",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "publishConfig": {
     "access": "public"
   },

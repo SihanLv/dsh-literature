@@ -1,7 +1,7 @@
 {
   "name": "@shlv/dsh-literature-tool",
   "description": "Model-facing literature tools (literature_search / literature_bibtex / literature_fulltext) over the literature seam",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "publishConfig": {
     "access": "public"
   },
