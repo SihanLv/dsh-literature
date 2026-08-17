@@ -49,6 +49,16 @@ export const Config: z<Config> = z.object({
 /** A model-facing text content block (the only block kind this tool emits). */
 type TextBlock = { readonly type: 'text'; readonly text: string }
 
+/** Whether a value looks like a {@link LiteratureError} even from a duplicated package copy. */
+function isLiteratureError(error: unknown): error is LiteratureError {
+  return error instanceof LiteratureError || (
+    typeof error === 'object' &&
+    error !== null &&
+    (error as { name?: unknown }).name === 'LiteratureError' &&
+    typeof (error as { code?: unknown }).code === 'string'
+  )
+}
+
 /** One paper's canonical JSON projection. */
 interface PaperJson {
   readonly id: string
@@ -338,7 +348,7 @@ export function apply(ctx: Context, config: Config = {}): void {
     try {
       result = await ctx.literature.fulltext(input, signal)
     } catch (error) {
-      if (!(error instanceof LiteratureError) || error.code !== 'LITERATURE_FULLTEXT_UNAVAILABLE') throw error
+      if (!isLiteratureError(error) || error.code !== 'LITERATURE_FULLTEXT_UNAVAILABLE') throw error
       if (parent === undefined) {
         throw new LiteratureError('publisher PDF link resolution requires a calling agent', 'LITERATURE_FULLTEXT_UNAVAILABLE')
       }

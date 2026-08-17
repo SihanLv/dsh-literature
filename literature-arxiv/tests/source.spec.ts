@@ -172,6 +172,13 @@ describe('ArxivSource.downloadFulltext', () => {
     stubFetch('missing', 404)
     expect(await source().downloadFulltext('2510.10008', 'source')).toBeNull()
   })
+  it('returns null for a PDF-only e-print when asking for the source artifact', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response('%PDF-1.7', {
+      status: 200,
+      headers: { 'content-type': 'application/pdf' },
+    })))
+    expect(await source().downloadFulltext('2505.09633', 'source')).toBeNull()
+  })
 })
 
 describe('ArxivSource rate-limit backoff', () => {

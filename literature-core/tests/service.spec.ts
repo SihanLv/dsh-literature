@@ -4,6 +4,7 @@ import {
   LiteratureError,
   LiteratureRuntime,
   compact,
+  type FulltextResult,
   type LiteratureSource,
   type RawHit,
 } from '@shlv/dsh-literature-core'
@@ -276,6 +277,33 @@ describe('LiteratureRuntime.fulltext', () => {
     }))
     const result = await runtime.fulltext('2510.10008')
     expect(result.source).toBe('arxiv-pdf')
+  })
+
+  it('falls back when the source extraction error comes from a duplicated core copy', async () => {
+    const proto = LiteratureRuntime.prototype as unknown as {
+      extractArtifact: (kind: string, bytes: Uint8Array, id: string) => Promise<FulltextResult>
+    }
+    const original = proto.extractArtifact
+    const spy = vi.spyOn(proto, 'extractArtifact').mockImplementation(async function (this: unknown, kind, bytes, id) {
+      if (kind === 'source') {
+        throw Object.assign(new Error('the downloaded source is not a valid gzip archive'), { name: 'LiteratureError', code: 'LITERATURE_EXTRACTION_FAILED' })
+      }
+      return original.call(this, kind, bytes, id)
+    })
+    try {
+      const runtime = mount()
+      runtime.registerSource(source('dblp'))
+      runtime.registerSource(source('arxiv', {
+        lookup: async () => arxivHit('2510.10008', 'Paper.'),
+        downloadFulltext: async (_id, kind) => kind === 'source'
+          ? new TextEncoder().encode('%PDF-')
+          : kind === 'html' ? null : pdfBytes(),
+      }))
+      const result = await runtime.fulltext('2510.10008')
+      expect(result.source).toBe('arxiv-pdf')
+    } finally {
+      spy.mockRestore()
+    }
   })
 
   it('throws for a DOI-only record with no arXiv full text', async () => {

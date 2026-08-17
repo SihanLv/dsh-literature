@@ -88,6 +88,19 @@ function recognize(input: string): LiteratureRef {
   return { kind: 'title', title: trimmed }
 }
 
+/** Whether a value looks like a {@link LiteratureError}, even if it comes from a duplicated package copy.
+ * The seam routes on the structured `code` taxonomy, so a foreign `LiteratureError` instance from
+ * another copy of `@shlv/dsh-literature-core` must still be recognized.
+ */
+function isLiteratureError(error: unknown): error is LiteratureError {
+  return error instanceof LiteratureError || (
+    typeof error === 'object' &&
+    error !== null &&
+    (error as { name?: unknown }).name === 'LiteratureError' &&
+    typeof (error as { code?: unknown }).code === 'string'
+  )
+}
+
 /**
  * Config for the literature seam. `enabledSources` optionally pins which
  * sources run; omitted means every registered `available()` source runs.
@@ -207,14 +220,14 @@ export class LiteratureRuntime extends Service {
       if (outcome.status === 'fulfilled') hits.push(...outcome.value)
       else {
         failed += 1
-        if (outcome.reason instanceof LiteratureError && outcome.reason.code === 'LITERATURE_RATE_LIMITED') {
+        if (isLiteratureError(outcome.reason) && outcome.reason.code === 'LITERATURE_RATE_LIMITED') {
           // One throttled source must not sink the whole search; the other source still answers.
         }
       }
     })
     if (failed === sources.length && hits.length === 0) {
       const first = settled.find((outcome): outcome is PromiseRejectedResult => outcome.status === 'rejected')
-      if (first !== undefined && first.reason instanceof LiteratureError) throw first.reason
+      if (first !== undefined && isLiteratureError(first.reason)) throw first.reason
       throw new LiteratureError('all literature sources failed', 'LITERATURE_PROVIDER_UNAVAILABLE')
     }
     const records = mergeHits(hits)
@@ -454,7 +467,7 @@ export class LiteratureRuntime extends Service {
           // A 200 response that is not the expected artifact kind (e.g. the
           // e-print endpoint serving a PDF for a PDF-only submission) must
           // fall through to the next kind, not abort the acquisition.
-          if (!(error instanceof LiteratureError && error.code === 'LITERATURE_EXTRACTION_FAILED')) throw error
+          if (!isLiteratureError(error) || error.code !== 'LITERATURE_EXTRACTION_FAILED') throw error
         }
       }
     }

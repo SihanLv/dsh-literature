@@ -176,6 +176,14 @@ export class ArxivSource implements LiteratureSource {
     const url = `${this.wwwBase}${path}`
     const result = await this.get(url, signal)
     if (result.statusCode !== 200) return null
+    // A PDF-only submission serves its PDF at `/e-print` as well. The source
+    // artifact is genuinely unavailable in that case, so report null and let
+    // the seam fall through to HTML/PDF instead of trying to gunzip a PDF.
+    if (kind === 'source') {
+      const contentType = result.contentType ?? ''
+      const startsWithPdf = result.body.length >= 5 && new TextDecoder().decode(result.body.subarray(0, 5)) === '%PDF-'
+      if (contentType.includes('pdf') || startsWithPdf) return null
+    }
     return result.body
   }
 

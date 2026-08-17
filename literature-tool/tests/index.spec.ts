@@ -213,6 +213,31 @@ describe('dsh-tool-literature', () => {
     expect(text(result)).toContain('Extracted body')
   })
 
+  it('resolves a DOI-only record when the unavailable error comes from a duplicated core copy', async () => {
+    const writeText = vi.fn(async () => ({ operation: 'create' as const }))
+    const fulltext = vi.fn(async (input: string): Promise<FulltextResult> => {
+      if (input === 'https://example.com/paper.pdf') {
+        return { id: input, kind: 'fulltext', source: 'publisher-pdf', files: [{ path: 'paper.txt', kind: 'text', content: 'body' }], summary: 'Extracted body' }
+      }
+      throw Object.assign(new Error('no full text'), { name: 'LiteratureError', code: 'LITERATURE_FULLTEXT_UNAVAILABLE' })
+    })
+    const start = vi.fn(async () => settledRun({ pdfUrl: 'https://example.com/paper.pdf' }))
+    const ctx = await setup(
+      {
+        search: async () => searchResult([]),
+        bibtex: async () => ({ bibtex: '', source: 'arxiv', published: false }),
+        fulltext,
+        landingPage: async () => 'Page with a <a href="https://example.com/paper.pdf">PDF</a> link',
+        resolveRecord: async () => record({ id: 'doi:10.1/x', title: 'Paper.', doi: '10.1/x', published: true, sources: ['dblp'] }),
+      },
+      { resolve: async path => ({ displayPath: `/ws/${path}` }), writeText },
+      { getProvider: () => ({ name: 'spawn' }), start },
+    )
+    const result = await execute(ctx, 'literature_fulltext', { query: '10.1/x', run_in_background: false })
+    expect(fulltext).toHaveBeenCalledTimes(2)
+    expect(text(result)).toContain('Extracted body')
+  })
+
   it('resolves a landing-page URL input through a subagent', async () => {
     const fulltext = vi.fn(async (input: string): Promise<FulltextResult> => {
       if (input === 'https://example.com/paper.pdf') {
